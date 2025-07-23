@@ -73,17 +73,12 @@ export default function LoadingSpinner({
         <div className="relative">
           {/* Outer Ring */}
           <div
-            className={`${sizeClasses[size]} border-4 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin`}
-          ></div>
-
-          {/* Middle Ring */}
-          <div
-            className={`absolute inset-2 ${size === "xl" ? "w-40 h-40" : size === "lg" ? "w-24 h-24" : size === "md" ? "w-12 h-12" : "w-6 h-6"} border-3 border-yellow-600/50 border-b-yellow-600 rounded-full animate-spin animate-reverse`}
+            className={`${sizeClasses[size]} border-4 border-yellow-400 border-t-transparent rounded-full animate-spin`}
           ></div>
 
           {/* Inner Ring */}
           <div
-            className={`absolute inset-4 ${size === "xl" ? "w-32 h-32" : size === "lg" ? "w-16 h-16" : size === "md" ? "w-8 h-8" : "w-4 h-4"} border-2 border-yellow-300/70 border-l-yellow-300 rounded-full animate-spin`}
+            className={`absolute inset-2 ${size === "xl" ? "w-40 h-40" : size === "lg" ? "w-24 h-24" : size === "md" ? "w-12 h-12" : "w-6 h-6"} border-3 border-green-500 border-b-transparent rounded-full animate-spin animate-reverse`}
           ></div>
 
           {/* Center Pulse */}
@@ -108,6 +103,13 @@ export default function LoadingSpinner({
         {type === "page" && (
           <div className="mt-6 w-64 bg-gray-800 rounded-full h-2 overflow-hidden">
             <div className="h-full bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full animate-pulse"></div>
+          </div>
+        )}
+
+        {/* PUBG text */}
+        {type !== "button" && (
+          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-yellow-400 font-bold text-sm animate-pulse">
+            PUBG Mobile
           </div>
         )}
       </div>

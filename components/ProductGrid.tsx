@@ -35,6 +35,36 @@ const mockProducts = [
     skins: "20+ سكن",
     weapons: "مركبات نادرة",
   },
+  {
+    id: 4,
+    title: "حساب ديامند مع UC",
+    price: "200 ريال",
+    image: "/placeholder.svg?height=300&width=400&text=PUBG+Account",
+    rank: "ديامند",
+    level: "60",
+    skins: "15+ سكن",
+    weapons: "UC متوفر",
+  },
+  {
+    id: 5,
+    title: "حساب بلاتينيوم مميز",
+    price: "150 ريال",
+    image: "/placeholder.svg?height=300&width=400&text=PUBG+Account",
+    rank: "بلاتينيوم",
+    level: "50",
+    skins: "10+ سكن",
+    weapons: "أسلحة نادرة",
+  },
+  {
+    id: 6,
+    title: "حساب جولد للمبتدئين",
+    price: "100 ريال",
+    image: "/placeholder.svg?height=300&width=400&text=PUBG+Account",
+    rank: "جولد",
+    level: "40",
+    skins: "5+ سكن",
+    weapons: "أسلحة أساسية",
+  },
 ]
 
 export default function ProductGrid() {
