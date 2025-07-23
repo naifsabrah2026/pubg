@@ -395,9 +395,330 @@ function showNotification(message, type = "info", duration = 5000) {
 }
 
 function hideNotification(notification) {
-    notification.classList.remove('show');
+  notification.classList.remove("show")
+
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification)
+    }
+  }, 300)
+}
+
+function getNotificationIcon(type) {
+  const icons = {
+    success: "fas fa-check-circle",
+    error: "fas fa-exclamation-circle",
+    warning: "fas fa-exclamation-triangle",
+    info: "fas fa-info-circle",
+  }
+
+  return icons[type] || icons.info
+}
+
+// Utility Functions
+function formatPrice(price) {
+  return new Intl.NumberFormat("ar-SA", {
+    style: "currency",
+    currency: "SAR",
+  }).format(price)
+}
+
+function formatDate(date) {
+  return new Intl.DateTimeFormat("ar-SA", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(date))
+}
+
+function debounce(func, wait) {
+  let timeout
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout)
+      func(...args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+  }
+}
+
+// AJAX Functions
+function makeRequest(url, options = {}) {
+  const defaultOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+    },
+  }
+
+  const finalOptions = { ...defaultOptions, ...options }
+
+  return fetch(url, finalOptions)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      return response.json()
+    })
+    .catch((error) => {
+      console.error("Request failed:", error)
+      showNotification("حدث خطأ في الطلب", "error")
+      throw error
+    })
+}
+
+// Export functions for global use
+window.AdminJS = {
+  showModal,
+  hideModal,
+  showNotification,
+  hideNotification,
+  validateForm,
+  formatPrice,
+  formatDate,
+  makeRequest,
+}
+
+// Add CSS for notifications and form validation
+const style = document.createElement("style")
+style.textContent = `
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 300px;
+        max-width: 500px;
+        z-index: 10000;
+        transform: translateX(100%);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
     
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
+    .notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    
+    .notification-success {
+        border-left: 4px solid #28a745;
+        color: #155724;
+    }
+    
+    .notification-error {
+        border-left: 4px solid #dc3545;
+        color: #721c24;
+    }
+    
+    .notification-warning {
+        border-left: 4px solid #ffc107;
+        color: #856404;
+    }
+    
+    .notification-info {
+        border-left: 4px solid #17a2b8;
+        color: #0c5460;
+    }
+    
+    .notification-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+    
+    .notification-close {
+        background: none;
+        border: none;
+        color: #999;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: all 0.3s;
+    }
+    
+    .notification-close:hover {
+        background: #f8f9fa;
+        color: #666;
+    }
+    
+    .field-error {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 4px;
+    }
+    
+    .form-group input.error,
+    .form-group textarea.error,
+    .form-group select.error {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+    
+    .sort-asc::after {
+        content: ' ↑';
+        color: #f59e0b;
+    }
+    
+    .sort-desc::after {
+        content: ' ↓';
+        color: #f59e0b;
+    }
+`
+document.head.appendChild(style)
+
+// Product management functions
+function showAddProductModal() {
+  const modal = document.getElementById("productModal") || document.getElementById("addProductModal")
+  const form = modal.querySelector("form")
+  const title = modal.querySelector("#modalTitle") || modal.querySelector("h3")
+
+  if (title) title.textContent = "إضافة منتج جديد"
+  if (form) {
+    form.reset()
+    form.querySelector('input[name="action"]').value = "add"
+    form.querySelector('input[name="id"]').value = ""
+
+    const statusGroup = form.querySelector("#statusGroup")
+    if (statusGroup) statusGroup.style.display = "none"
+  }
+
+  showModal(modal)
+}
+
+function editProduct(id) {
+  // Fetch product data and populate form
+  fetch(`api/get_product.php?id=${id}`)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        populateProductForm(data.product, "edit")
+        showModal("productModal")
+      } else {
+        showNotification("خطأ في جلب بيانات المنتج", "error")
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error)
+      showNotification("حدث خطأ في الاتصال", "error")
+    })
+}
+
+function populateProductForm(product, action) {
+  const modal = document.getElementById("productModal")
+  const form = modal.querySelector("form")
+  const title = modal.querySelector("#modalTitle")
+
+  if (title) title.textContent = action === "edit" ? "تعديل المنتج" : "إضافة منتج جديد"
+
+  // Populate form fields
+  Object.keys(product).forEach((key) => {
+    const field = form.querySelector(`[name="${key}"]`)
+    if (field) {
+      if (field.type === "checkbox") {
+        field.checked = product[key]
+      } else {
+        field.value = product[key]
+      }
+    }
+  })
+
+  form.querySelector('input[name="action"]').value = action
+  form.querySelector('input[name="id"]').value = product.id || ""
+
+  const statusGroup = form.querySelector("#statusGroup")
+  if (statusGroup) {
+    statusGroup.style.display = action === "edit" ? "block" : "none"
+  }
+}
+
+function deleteProduct(id) {
+  if (confirm("هل أنت متأكد من حذف هذا المنتج؟")) {
+    const formData = new FormData()
+    formData.append("action", "delete")
+    formData.append("id", id)
+
+    fetch("products.php", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.text())
+      .then(() => {
+        showNotification("تم حذف المنتج بنجاح", "success")
+        setTimeout(() => location.reload(), 1500)
+      })
+      .catch((error) => {
+        console.error("Error:", error)
+        showNotification("حدث خطأ في حذف المنتج", "error")
+      })
+  }
+}
+
+// News management
+function showAddNewsModal() {
+  const modal = document.getElementById("newsModal")
+  if (modal) {
+    const form = modal.querySelector("form")
+    if (form) form.reset()
+    showModal("newsModal")
+  }
+}
+
+// Export functionality
+function exportData() {
+  const exportOptions = [
+    { label: "تصدير المنتجات", action: "products" },
+    { label: "تصدير الطلبات", action: "orders" },
+    { label: "تصدير المستخدمين", action: "users" },
+    { label: "تصدير التقرير الشامل", action: "full_report" },
+  ]
+
+  const modal = document.createElement("div")
+  modal.className = "modal show"
+  modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>تصدير البيانات</h3>
+                <button class="modal-close" onclick="this.closest('.modal').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-form">
+                <p>اختر نوع البيانات المراد تصديرها:</p>
+                <div class="export-options">
+                    ${exportOptions
+                      .map(
+                        (option) => `
+                        <button class="btn btn-secondary export-btn" data-action="${option.action}">
+                            <i class="fas fa-download"></i>
+                            ${option.label}
+                        </button>
+                    `,
+                      )
+                      .join("")}
+                </div>
+            </div>
+        </div>
+    `
+
+  document.body.appendChild(modal)
+
+  // Add event listeners
+  modal.querySelectorAll(".export-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const action = this.dataset.action
+      window.open(`api/export.php?type=${action}`, "_blank")
+      modal.remove()
+    })
+  })
+}
