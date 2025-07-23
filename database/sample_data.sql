@@ -1,217 +1,162 @@
--- إدراج بيانات تجريبية شاملة للمتجر
+-- Sample Data for PUBG Store
 
--- إدراج المزيد من المنتجات
-INSERT INTO products (title, description, price, rank_name, level, skins_count, weapons, features, images, category, views) VALUES
+USE pubg_store;
 
--- حسابات كونكر مميزة
-('حساب كونكر S1 مع M416 الجليدي', 'حساب كونكر مميز للموسم الأول مع M416 الجليدي النادر وأكثر من 80 سكن مميز. يحتوي على جميع الأسلحة الذهبية والأزياء النادرة.', 750.00, 'Conqueror', 100, 80, 'M416 الجليدي، AKM الذهبي، AWM المطور، Groza النادر، VSS الأسطوري، Kar98k الذهبي', '["رتبة كونكر S1", "M416 الجليدي", "أسلحة ذهبية", "أزياء نادرة", "UC متوفر", "شخصيات مميزة"]', '["assets/images/conqueror-s1-1.jpg", "assets/images/conqueror-s1-2.jpg", "assets/images/conqueror-s1-3.jpg", "assets/images/conqueror-s1-4.jpg"]', 'conqueror', 245),
+-- Insert sample products
+INSERT INTO products (title, description, price, category, rank, level, skins_count, weapons, features, main_image, images, details, featured) VALUES
+('حساب كونكر مميز - سيزن 25', 'حساب كونكر مع أسلحة ذهبية نادرة وأزياء حصرية', 450.00, 'conqueror', 'كونكر', 85, 50, 'أسلحة ذهبية، M416 الجليدي، AKM التنين', 
+ JSON_ARRAY('رتبة كونكر', 'أسلحة ذهبية', 'أزياء نادرة', 'UC متوفر', 'حساب آمن'), 
+ 'public/placeholder.jpg', 
+ JSON_ARRAY('public/placeholder.jpg', 'public/placeholder.jpg', 'public/placeholder.jpg'),
+ JSON_OBJECT('kd', '3.2', 'matches', '1250', 'wins', '320', 'uc', '15000', 'tier_points', '4500'),
+ TRUE),
 
-('حساب كونكر S2 مع Glacier M416', 'حساب كونكر للموسم الثاني مع سلاح Glacier M416 الأسطوري. يحتوي على مجموعة كاملة من الأسلحة المطورة والأزياء الحصرية.', 850.00, 'Conqueror', 100, 95, 'Glacier M416، AKM الأسطوري، AWM الجليدي، Groza المطور، UMP45 الذهبي، Tommy Gun النادر', '["رتبة كونكر S2", "Glacier M416", "أسلحة أسطورية", "أزياء حصرية", "UC كبير", "مركبات نادرة"]', '["assets/images/conqueror-s2-1.jpg", "assets/images/conqueror-s2-2.jpg", "assets/images/conqueror-s2-3.jpg", "assets/images/conqueror-s2-4.jpg"]', 'conqueror', 189),
+('حساب آيس مع M416 الجليدي', 'حساب آيس مستوى عالي مع أسلحة مميزة', 280.00, 'ace', 'آيس', 78, 35, 'M416 الجليدي، AKM الذهبي، AWM الأسود', 
+ JSON_ARRAY('رتبة آيس', 'M416 الجليدي', 'أزياء متنوعة', 'مستوى عالي'), 
+ 'public/placeholder.jpg', 
+ JSON_ARRAY('public/placeholder.jpg', 'public/placeholder.jpg'),
+ JSON_OBJECT('kd', '2.8', 'matches', '980', 'wins', '245', 'uc', '8500', 'tier_points', '3200'),
+ TRUE),
 
-('حساب كونكر S3 مع Fool M416', 'حساب كونكر للموسم الثالث مع سلاح Fool M416 النادر جداً. مجموعة شاملة من الأسلحة والأزياء والمركبات.', 950.00, 'Conqueror', 100, 110, 'Fool M416، AKM الأحمر، AWM الأسود، Groza الذهبي، VSS المطور، Vector الأسطوري', '["رتبة كونكر S3", "Fool M416", "أسلحة نادرة جداً", "أزياء أسطورية", "UC ضخم", "مركبات حصرية"]', '["assets/images/conqueror-s3-1.jpg", "assets/images/conqueror-s3-2.jpg", "assets/images/conqueror-s3-3.jpg", "assets/images/conqueror-s3-4.jpg"]', 'conqueror', 312),
+('حساب كراون مع أزياء حصرية', 'حساب كراون بأزياء نادرة ومجموعة أسلحة متميزة', 180.00, 'crown', 'كراون', 65, 28, 'SCAR-L الذهبي، Vector الأزرق، Kar98k المطور', 
+ JSON_ARRAY('رتبة كراون', 'أزياء حصرية', 'أسلحة متطورة', 'حساب نظيف'), 
+ 'public/placeholder.jpg', 
+ JSON_ARRAY('public/placeholder.jpg', 'public/placeholder.jpg'),
+ JSON_OBJECT('kd', '2.5', 'matches', '750', 'wins', '180', 'uc', '5500', 'tier_points', '2800'),
+ FALSE),
 
--- حسابات آيس مميزة
-('حساب آيس مع أسلحة ذهبية متنوعة', 'حساب برتبة آيس يحتوي على مجموعة متنوعة من الأسلحة الذهبية والأزياء المميزة. مثالي للاعبين المحترفين.', 450.00, 'Ace', 90, 45, 'M416 الذهبي، AKM الأزرق، AWM المطور، SCAR-L الأحمر، UMP45 الذهبي', '["رتبة آيس", "أسلحة ذهبية", "أزياء مميزة", "مركبات جميلة", "UC متوسط"]', '["assets/images/ace-1.jpg", "assets/images/ace-2.jpg", "assets/images/ace-3.jpg"]', 'premium', 156),
+('حساب دايموند مع UC كثير', 'حساب دايموند مع رصيد UC عالي وأسلحة جيدة', 120.00, 'diamond', 'دايموند', 52, 22, 'M416 المطور، AKM الأحمر، UMP45 الذهبي', 
+ JSON_ARRAY('رتبة دايموند', 'UC عالي', 'أسلحة جيدة', 'مستوى متوسط'), 
+ 'public/placeholder.jpg', 
+ JSON_ARRAY('public/placeholder.jpg', 'public/placeholder.jpg'),
+ JSON_OBJECT('kd', '2.1', 'matches', '650', 'wins', '140', 'uc', '12000', 'tier_points', '2200'),
+ FALSE),
 
-('حساب آيس مع مجموعة الأزياء النادرة', 'حساب آيس مع تركيز على الأزياء النادرة والشخصيات المميزة. يحتوي على أكثر من 60 زي نادر.', 520.00, 'Ace', 85, 60, 'M416 الأزرق، AKM المطور، AWM الأحمر، Groza العادي، VSS المحسن', '["رتبة آيس", "أزياء نادرة", "شخصيات مميزة", "UC جيد", "مركبات متنوعة"]', '["assets/images/ace-premium-1.jpg", "assets/images/ace-premium-2.jpg", "assets/images/ace-premium-3.jpg"]', 'premium', 198),
+('حساب بلاتينيوم للمبتدئين', 'حساب بلاتينيوم مناسب للمبتدئين بسعر مناسب', 80.00, 'platinum', 'بلاتينيوم', 38, 15, 'M416 العادي، AKM الأزرق، Vector الأحمر', 
+ JSON_ARRAY('رتبة بلاتينيوم', 'مناسب للمبتدئين', 'سعر مناسب', 'حساب نظيف'), 
+ 'public/placeholder.jpg', 
+ JSON_ARRAY('public/placeholder.jpg'),
+ JSON_OBJECT('kd', '1.8', 'matches', '450', 'wins', '95', 'uc', '3500', 'tier_points', '1800'),
+ FALSE),
 
--- حسابات كراون
-('حساب كراون مع مركبات نادرة', 'حساب برتبة كراون يحتوي على مجموعة رائعة من المركبات النادرة والأسلحة المطورة.', 320.00, 'Crown', 75, 35, 'M416 المحسن، AKM العادي، AWM الأساسي، SCAR-L المطور، UMP45 العادي', '["رتبة كراون", "مركبات نادرة", "أسلحة مطورة", "أزياء جميلة", "UC قليل"]', '["assets/images/crown-1.jpg", "assets/images/crown-2.jpg", "assets/images/crown-3.jpg"]', 'various', 134),
+('حساب ذهبي مع أزياء', 'حساب ذهبي بأزياء متنوعة وأسلحة أساسية', 60.00, 'gold', 'ذهبي', 28, 12, 'M416 الأساسي، AKM العادي، SCAR-L الأزرق', 
+ JSON_ARRAY('رتبة ذهبي', 'أزياء متنوعة', 'أسلحة أساسية', 'للمبتدئين'), 
+ 'public/placeholder.jpg', 
+ JSON_ARRAY('public/placeholder.jpg'),
+ JSON_OBJECT('kd', '1.5', 'matches', '320', 'wins', '65', 'uc', '2000', 'tier_points', '1200'),
+ FALSE),
 
-('حساب كراون للمبتدئين المتقدمين', 'حساب مثالي للاعبين الذين يريدون الانتقال من المستوى المبتدئ إلى المتقدم. يحتوي على أساسيات جيدة.', 280.00, 'Crown', 70, 25, 'M416 العادي، AKM الأساسي، AWM العادي، SCAR-L العادي، Vector الأساسي', '["رتبة كراون", "مناسب للمتقدمين", "أسلحة أساسية", "أزياء عادية"]', '["assets/images/crown-beginner-1.jpg", "assets/images/crown-beginner-2.jpg"]', 'various', 89),
+('حساب فضي اقتصادي', 'حساب فضي بسعر اقتصادي للبداية', 40.00, 'silver', 'فضي', 22, 8, 'M416 العادي، AKM الأساسي', 
+ JSON_ARRAY('رتبة فضي', 'سعر اقتصادي', 'للمبتدئين', 'حساب آمن'), 
+ 'public/placeholder.jpg', 
+ JSON_ARRAY('public/placeholder.jpg'),
+ JSON_OBJECT('kd', '1.2', 'matches', '200', 'wins', '35', 'uc', '1000', 'tier_points', '800'),
+ FALSE),
 
--- حسابات ديامند
-('حساب ديامند مع UC كبير', 'حساب برتبة ديامند يحتوي على كمية كبيرة من UC والأسلحة المتنوعة. خيار اقتصادي ممتاز.', 220.00, 'Diamond', 65, 20, 'M416 العادي، AKM العادي، AWM الأساسي، SCAR-L العادي، UMP45 العادي', '["رتبة ديامند", "UC كبير", "أسلحة متنوعة", "قيمة ممتازة"]', '["assets/images/diamond-1.jpg", "assets/images/diamond-2.jpg", "assets/images/diamond-3.jpg"]', 'various', 167),
+('حساب برونزي للبداية', 'حساب برونزي مثالي لبداية اللعب', 25.00, 'bronze', 'برونزي', 15, 5, 'أسلحة أساسية', 
+ JSON_ARRAY('رتبة برونزي', 'للمبتدئين', 'سعر منخفض', 'بداية جيدة'), 
+ 'public/placeholder.jpg', 
+ JSON_ARRAY('public/placeholder.jpg'),
+ JSON_OBJECT('kd', '1.0', 'matches', '100', 'wins', '15', 'uc', '500', 'tier_points', '400'),
+ FALSE),
 
-('حساب ديامند مع أسلحة محسنة', 'حساب ديامند يركز على الأسلحة المحسنة والمطورة. مناسب للاعبين الذين يهتمون بالأداء.', 250.00, 'Diamond', 68, 18, 'M416 المحسن، AKM المطور، AWM المحسن، SCAR-L المطور، Vector المحسن', '["رتبة ديامند", "أسلحة محسنة", "أداء ممتاز", "UC متوسط"]', '["assets/images/diamond-enhanced-1.jpg", "assets/images/diamond-enhanced-2.jpg"]', 'various', 123),
+('حساب مميز VIP', 'حساب VIP مع جميع الأزياء والأسلحة النادرة', 650.00, 'premium', 'كونكر', 95, 75, 'جميع الأسلحة الذهبية والنادرة', 
+ JSON_ARRAY('حساب VIP', 'جميع الأزياء', 'أسلحة نادرة', 'مستوى عالي جداً'), 
+ 'public/placeholder.jpg', 
+ JSON_ARRAY('public/placeholder.jpg', 'public/placeholder.jpg', 'public/placeholder.jpg', 'public/placeholder.jpg'),
+ JSON_OBJECT('kd', '4.5', 'matches', '2000', 'wins', '650', 'uc', '25000', 'tier_points', '6000'),
+ TRUE),
 
--- حسابات بلاتينيوم
-('حساب بلاتينيوم مع مجموعة متوازنة', 'حساب بلاتينيوم يوفر توازن جيد بين الأسلحة والأزياء والسعر. خيار ممتاز للاعبين المتوسطين.', 180.00, 'Platinum', 55, 15, 'M416 العادي، AKM العادي، AWM العادي، SCAR-L العادي، UMP45 العادي', '["رتبة بلاتينيوم", "مجموعة متوازنة", "سعر مناسب", "جودة جيدة"]', '["assets/images/platinum-1.jpg", "assets/images/platinum-2.jpg"]', 'various', 145),
+('حساب متنوع شامل', 'حساب متنوع يحتوي على مجموعة شاملة من الأسلحة والأزياء', 150.00, 'various', 'دايموند', 45, 30, 'مجموعة متنوعة من الأسلحة', 
+ JSON_ARRAY('حساب متنوع', 'أسلحة متنوعة', 'أزياء مختلفة', 'قيمة جيدة'), 
+ 'public/placeholder.jpg', 
+ JSON_ARRAY('public/placeholder.jpg', 'public/placeholder.jpg'),
+ JSON_OBJECT('kd', '2.3', 'matches', '600', 'wins', '150', 'uc', '7000', 'tier_points', '2500'),
+ FALSE);
 
-('حساب بلاتينيوم للمبتدئين المتميزين', 'حساب مصمم خصيصاً للمبتدئين الذين يريدون البدء بحساب جيد دون إنفاق مبلغ كبير.', 160.00, 'Platinum', 50, 12, 'M416 الأساسي، AKM الأساسي، AWM العادي، SCAR-L الأساسي', '["رتبة بلاتينيوم", "مناسب للمبتدئين", "سعر اقتصادي", "جودة مضمونة"]', '["assets/images/platinum-starter-1.jpg", "assets/images/platinum-starter-2.jpg"]', 'various', 98),
+-- Insert sample users
+INSERT INTO users (username, email, password_hash, full_name, phone, role, status) VALUES
+('admin', 'admin@pubgstore.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'مدير النظام', '+967777826667', 'admin', 'active'),
+('editor1', 'editor@pubgstore.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'محرر المحتوى', '+967777826668', 'editor', 'active'),
+('user1', 'user1@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'أحمد محمد', '+967777826669', 'user', 'active'),
+('user2', 'user2@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'فاطمة علي', '+967777826670', 'user', 'active');
 
--- حسابات جولد
-('حساب جولد الاقتصادي', 'حساب برتبة جولد بسعر اقتصادي جداً. يحتوي على الأساسيات المطلوبة للبدء في اللعبة.', 120.00, 'Gold', 45, 8, 'M416 الأساسي، AKM الأساسي، AWM العادي، SCAR-L الأساسي', '["رتبة جولد", "سعر اقتصادي", "أساسيات اللعبة", "مناسب للمبتدئين"]', '["assets/images/gold-1.jpg", "assets/images/gold-2.jpg"]', 'various', 234),
+-- Insert sample orders
+INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, total_amount, status, payment_method, payment_status, notes) VALUES
+('ORD-2024-001', 'خالد أحمد', 'khalid@example.com', '+967777111111', 450.00, 'completed', 'whatsapp', 'paid', 'طلب حساب كونكر مميز'),
+('ORD-2024-002', 'سارة محمد', 'sara@example.com', '+967777111112', 280.00, 'completed', 'bank_transfer', 'paid', 'طلب حساب آيس'),
+('ORD-2024-003', 'عبدالله سالم', 'abdullah@example.com', '+967777111113', 180.00, 'processing', 'whatsapp', 'paid', 'طلب حساب كراون'),
+('ORD-2024-004', 'نورا حسن', 'nora@example.com', '+967777111114', 120.00, 'pending', 'whatsapp', 'pending', 'طلب حساب دايموند'),
+('ORD-2024-005', 'محمد علي', 'mohamed@example.com', '+967777111115', 650.00, 'completed', 'bank_transfer', 'paid', 'طلب حساب VIP');
 
-('حساب جولد مع أزياء جميلة', 'حساب جولد يركز على الأزياء الجميلة والشخصيات اللطيفة. مثالي للاعبين الذين يحبون المظهر الجميل.', 140.00, 'Gold', 48, 10, 'M416 العادي، AKM العادي، AWM الأساسي، SCAR-L العادي', '["رتبة جولد", "أزياء جميلة", "شخصيات لطيفة", "مظهر مميز"]', '["assets/images/gold-fashion-1.jpg", "assets/images/gold-fashion-2.jpg"]', 'various', 176),
+-- Insert order items
+INSERT INTO order_items (order_id, product_id, product_title, product_price, quantity, subtotal) VALUES
+(1, 1, 'حساب كونكر مميز - سيزن 25', 450.00, 1, 450.00),
+(2, 2, 'حساب آيس مع M416 الجليدي', 280.00, 1, 280.00),
+(3, 3, 'حساب كراون مع أزياء حصرية', 180.00, 1, 180.00),
+(4, 4, 'حساب دايموند مع UC كثير', 120.00, 1, 120.00),
+(5, 9, 'حساب مميز VIP', 650.00, 1, 650.00);
 
--- حسابات خاصة ونادرة
-('حساب نادر مع Pharaoh X-Suit', 'حساب نادر جداً يحتوي على بدلة Pharaoh X-Suit الأسطورية. قطعة مجموعات نادرة للغاية.', 1200.00, 'Conqueror', 100, 120, 'جميع الأسلحة الأسطورية، Pharaoh X-Suit، مجموعة كاملة من الأسلحة النادرة', '["Pharaoh X-Suit", "حساب نادر جداً", "مجموعة أسطورية", "قيمة استثمارية"]', '["assets/images/pharaoh-1.jpg", "assets/images/pharaoh-2.jpg", "assets/images/pharaoh-3.jpg", "assets/images/pharaoh-4.jpg"]', 'conqueror', 89),
+-- Insert sample news
+INSERT INTO news (text, active, views, sort_order) VALUES
+('🔥 عروض خاصة على حسابات الكونكر - خصم 20%', TRUE, 1250, 1),
+('⭐ وصلت حسابات جديدة مع أسلحة ذهبية نادرة', TRUE, 890, 2),
+('🎮 متوفر الآن: حسابات مع رتبة الكونكر للموسم الحالي', TRUE, 567, 3),
+('💎 حسابات VIP مع جميع الأزياء المميزة', TRUE, 445, 4),
+('🏆 ضمان 100% على جميع الحسابات المباعة', TRUE, 678, 5),
+('🚀 تسليم فوري لجميع الحسابات بعد تأكيد الدفع', TRUE, 334, 6),
+('🛡️ دعم فني متاح 24/7 لحل أي مشكلة', TRUE, 556, 7);
 
-('حساب مع Godzilla Set كامل', 'حساب يحتوي على مجموعة Godzilla الكاملة النادرة. تشمل جميع عناصر المجموعة والأسلحة المرتبطة.', 1100.00, 'Ace', 95, 100, 'Godzilla AKM، Kong M416، جميع أسلحة المجموعة، مركبات Godzilla', '["Godzilla Set كامل", "مجموعة نادرة", "أسلحة خاصة", "مركبات مميزة"]', '["assets/images/godzilla-1.jpg", "assets/images/godzilla-2.jpg", "assets/images/godzilla-3.jpg"]', 'premium', 156),
+-- Insert sample activities
+INSERT INTO activities (type, description, icon, user_id, related_id, amount, ip_address) VALUES
+('product_sold', 'تم بيع حساب كونكر مميز', 'fas fa-shopping-cart', 1, 1, 450.00, '192.168.1.1'),
+('order_created', 'تم إنشاء طلب جديد', 'fas fa-plus-circle', NULL, 1, 450.00, '192.168.1.2'),
+('product_added', 'تم إضافة منتج جديد', 'fas fa-box', 1, 2, NULL, '192.168.1.1'),
+('user_registered', 'مستخدم جديد سجل في الموقع', 'fas fa-user-plus', 3, NULL, NULL, '192.168.1.3'),
+('admin_login', 'تسجيل دخول المدير', 'fas fa-sign-in-alt', 1, NULL, NULL, '192.168.1.1'),
+('product_sold', 'تم بيع حساب آيس مع M416', 'fas fa-shopping-cart', 1, 2, 280.00, '192.168.1.4'),
+('news_added', 'تم إضافة خبر جديد', 'fas fa-newspaper', 1, 1, NULL, '192.168.1.1'),
+('order_updated', 'تم تحديث حالة الطلب', 'fas fa-edit', 1, 3, NULL, '192.168.1.1');
 
-('حساب مع McLaren 765LT', 'حساب يحتوي على سيارة McLaren 765LT النادرة مع مجموعة من الأسلحة المميزة والأزياء الرياضية.', 800.00, 'Crown', 80, 55, 'M416 الرياضي، AKM السريع، AWM المتطور، مجموعة أسلحة رياضية', '["McLaren 765LT", "سيارة نادرة", "أزياء رياضية", "مجموعة سريعة"]', '["assets/images/mclaren-1.jpg", "assets/images/mclaren-2.jpg", "assets/images/mclaren-3.jpg"]', 'premium', 201);
+-- Insert sample settings
+INSERT INTO settings (setting_key, setting_value, setting_type, description) VALUES
+('site_name', 'متجر حسابات PUBG Mobile', 'string', 'اسم الموقع'),
+('site_description', 'أفضل متجر لبيع حسابات PUBG Mobile المميزة', 'string', 'وصف الموقع'),
+('whatsapp_number', '+967777826667', 'string', 'رقم الواتساب'),
+('currency', 'SAR', 'string', 'العملة المستخدمة'),
+('tax_rate', '0.15', 'number', 'معدل الضريبة'),
+('free_shipping_threshold', '200', 'number', 'الحد الأدنى للشحن المجاني'),
+('maintenance_mode', 'false', 'boolean', 'وضع الصيانة'),
+('max_upload_size', '5', 'number', 'الحد الأقصى لحجم الملف بالميجابايت'),
+('email_notifications', 'true', 'boolean', 'تفعيل إشعارات البريد الإلكتروني'),
+('social_links', '{"facebook": "", "twitter": "", "instagram": "", "telegram": ""}', 'json', 'روابط وسائل التواصل الاجتماعي');
 
--- إدراج المزيد من الأخبار
-INSERT INTO news (title, content, is_active) VALUES
-('🎉 افتتاح قسم الحسابات النادرة!', 'تم افتتاح قسم جديد للحسابات النادرة والمجموعات الخاصة. اكتشف مجموعتنا الحصرية من الحسابات الأسطورية!', TRUE),
-('💎 عرض خاص: خصم 25% على حسابات الآيس', 'لفترة محدودة! احصل على خصم 25% على جميع حسابات الآيس. العرض ساري حتى نهاية الشهر.', TRUE),
-('🚗 وصول حسابات McLaren الجديدة', 'وصلت مجموعة جديدة من الحسابات التي تحتوي على سيارات McLaren النادرة. كميات محدودة!', TRUE),
-('🔥 تخفيضات الجمعة البيضاء قادمة!', 'استعدوا لأكبر تخفيضات السنة! تخفيضات تصل إلى 50% على مجموعة مختارة من الحسابات.', TRUE),
-('⚡ تحديث: تحسين خدمة التسليم', 'تم تحسين خدمة التسليم لتصبح أسرع وأكثر أماناً. التسليم الآن خلال 5 دقائق من تأكيد الدفع!', TRUE),
-('🎮 نصائح للعب PUBG Mobile بشكل أفضل', 'تعلم أفضل الاستراتيجيات والتكتيكات للفوز في PUBG Mobile من خبرائنا المحترفين.', TRUE),
-('🛡️ ضمان الأمان المحدث', 'تم تحديث سياسة ضمان الأمان لتشمل حماية إضافية لجميع العملاء. حسابك آمن معنا 100%!', TRUE),
-('📱 تطبيق المتجر قادم قريباً', 'نعمل على تطوير تطبيق محمول للمتجر لتسهيل عملية التصفح والشراء. ترقبوا الإطلاق قريباً!', FALSE);
+-- Insert sample coupons
+INSERT INTO coupons (code, type, value, minimum_amount, usage_limit, active, expires_at) VALUES
+('WELCOME20', 'percentage', 20.00, 100.00, 100, TRUE, DATE_ADD(NOW(), INTERVAL 30 DAY)),
+('NEWUSER', 'fixed', 25.00, 150.00, 50, TRUE, DATE_ADD(NOW(), INTERVAL 60 DAY)),
+('VIP50', 'fixed', 50.00, 500.00, 20, TRUE, DATE_ADD(NOW(), INTERVAL 90 DAY)),
+('SUMMER15', 'percentage', 15.00, 80.00, 200, TRUE, DATE_ADD(NOW(), INTERVAL 45 DAY));
 
--- إدراج طلبات تجريبية
-INSERT INTO orders (product_id, customer_name, customer_phone, customer_email, status, total_amount, notes) VALUES
-(1, 'أحمد محمد علي', '+966501234567', 'ahmed.mohamed@email.com', 'completed', 500.00, 'تم التسليم بنجاح والعميل راضي جداً'),
-(3, 'فاطمة أحمد', '+966507654321', 'fatima.ahmed@email.com', 'completed', 250.00, 'عميلة مميزة، طلبت حسابات إضافية'),
-(2, 'محمد حسن', '+966509876543', 'mohamed.hassan@email.com', 'pending', 350.00, 'في انتظار تأكيد الدفع'),
-(5, 'سارة عبدالله', '+966502468135', 'sara.abdullah@email.com', 'confirmed', 450.00, 'تم تأكيد الطلب، جاري التحضير'),
-(4, 'عبدالرحمن خالد', '+966508642097', 'abdulrahman.khalid@email.com', 'completed', 200.00, 'عميل دائم، خدمة ممتازة'),
-(6, 'نورا سعد', '+966503691472', 'nora.saad@email.com', 'pending', 280.00, 'طلب جديد، في انتظار المراجعة'),
-(1, 'خالد العتيبي', '+966505827394', 'khalid.otaibi@email.com', 'cancelled', 500.00, 'ألغى العميل الطلب لظروف شخصية'),
-(7, 'ريم المطيري', '+966504938261', 'reem.mutairi@email.com', 'completed', 320.00, 'تسليم سريع وخدمة ممتازة'),
-(8, 'سلطان الدوسري', '+966506174829', 'sultan.dosari@email.com', 'confirmed', 220.00, 'عميل جديد، طلب أول'),
-(9, 'هند القحطاني', '+966507395184', 'hind.qahtani@email.com', 'pending', 250.00, 'استفسارات إضافية حول الحساب');
+-- Insert sample reviews
+INSERT INTO reviews (product_id, customer_name, customer_email, rating, comment, status) VALUES
+(1, 'خالد أحمد', 'khalid@example.com', 5, 'حساب ممتاز وتسليم سريع، أنصح بالتعامل معهم', 'approved'),
+(1, 'سارة محمد', 'sara@example.com', 5, 'حساب كما هو موصوف تماماً، شكراً لكم', 'approved'),
+(2, 'عبدالله سالم', 'abdullah@example.com', 4, 'حساب جيد جداً، M416 الجليدي رائع', 'approved'),
+(3, 'نورا حسن', 'nora@example.com', 5, 'أزياء جميلة وحساب نظيف، راضية جداً', 'approved'),
+(9, 'محمد علي', 'mohamed@example.com', 5, 'حساب VIP استثنائي، يستحق السعر', 'approved'),
+(4, 'أحمد حسن', 'ahmed@example.com', 4, 'UC كثير كما وعدتم، شكراً', 'approved');
 
--- إدراج مستخدمين إضافيين
-INSERT INTO users (username, email, password_hash, role) VALUES
-('manager', 'manager@pubgstore.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
-('support1', 'support1@pubgstore.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user'),
-('support2', 'support2@pubgstore.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user'),
-('sales_manager', 'sales@pubgstore.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+-- Insert sample page views for analytics
+INSERT INTO page_views (page_url, page_title, user_ip, referrer, session_id) VALUES
+('/', 'الصفحة الرئيسية', '192.168.1.100', 'https://google.com', 'sess_001'),
+('/accounts.php', 'حسابات PUBG', '192.168.1.101', '/', 'sess_002'),
+('/product.php?id=1', 'حساب كونكر مميز', '192.168.1.102', '/accounts.php', 'sess_003'),
+('/terms.php', 'شروط المتجر', '192.168.1.103', '/', 'sess_004'),
+('/admin/', 'لوحة الإدارة', '192.168.1.1', 'direct', 'sess_admin_001');
 
--- تحديث الإحصائيات
-UPDATE statistics SET 
-    total_products = (SELECT COUNT(*) FROM products WHERE status = 'active'),
-    total_orders = (SELECT COUNT(*) FROM orders),
-    total_sales = (SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE status = 'completed'),
-    total_users = (SELECT COUNT(*) FROM users),
-    updated_at = CURRENT_TIMESTAMP;
+-- Update product views
+UPDATE products SET views = FLOOR(RAND() * 500) + 50;
 
--- إنشاء جدول للتقييمات والمراجعات
-CREATE TABLE IF NOT EXISTS reviews (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    product_id INT,
-    customer_name VARCHAR(255) NOT NULL,
-    customer_email VARCHAR(255),
-    rating INT CHECK (rating >= 1 AND rating <= 5),
-    review_text TEXT,
-    is_approved BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-);
-
--- إدراج تقييمات تجريبية
-INSERT INTO reviews (product_id, customer_name, customer_email, rating, review_text, is_approved) VALUES
-(1, 'أحمد محمد', 'ahmed@email.com', 5, 'حساب ممتاز جداً! الأسلحة رائعة والخدمة سريعة. أنصح بشدة!', TRUE),
-(1, 'فاطمة علي', 'fatima@email.com', 5, 'أفضل متجر للحسابات! جودة عالية وأسعار مناسبة.', TRUE),
-(2, 'محمد حسن', 'mohamed@email.com', 4, 'حساب جيد جداً، الأسلحة كما هو موصوف. التسليم كان سريع.', TRUE),
-(3, 'سارة أحمد', 'sara@email.com', 5, 'خدمة ممتازة! الحساب أفضل من المتوقع. شكراً لكم.', TRUE),
-(4, 'عبدالله خالد', 'abdullah@email.com', 4, 'حساب جيد بسعر مناسب. التعامل مهني وسريع.', TRUE),
-(5, 'نورا سعد', 'nora@email.com', 5, 'متجر موثوق وحسابات أصلية. تجربة رائعة!', TRUE);
-
--- إنشاء جدول للكوبونات والخصومات
-CREATE TABLE IF NOT EXISTS coupons (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    code VARCHAR(50) UNIQUE NOT NULL,
-    discount_type ENUM('percentage', 'fixed') DEFAULT 'percentage',
-    discount_value DECIMAL(10,2) NOT NULL,
-    min_order_amount DECIMAL(10,2) DEFAULT 0,
-    max_uses INT DEFAULT NULL,
-    used_count INT DEFAULT 0,
-    valid_from TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    valid_until TIMESTAMP NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- إدراج كوبونات تجريبية
-INSERT INTO coupons (code, discount_type, discount_value, min_order_amount, max_uses, valid_until) VALUES
-('WELCOME20', 'percentage', 20.00, 100.00, 100, DATE_ADD(NOW(), INTERVAL 30 DAY)),
-('SAVE50', 'fixed', 50.00, 200.00, 50, DATE_ADD(NOW(), INTERVAL 15 DAY)),
-('NEWUSER', 'percentage', 15.00, 50.00, 200, DATE_ADD(NOW(), INTERVAL 60 DAY)),
-('BLACKFRIDAY', 'percentage', 40.00, 300.00, 1000, DATE_ADD(NOW(), INTERVAL 7 DAY)),
-('VIP10', 'percentage', 10.00, 0.00, NULL, DATE_ADD(NOW(), INTERVAL 365 DAY));
-
--- إنشاء جدول لسجل النشاطات
-CREATE TABLE IF NOT EXISTS activity_log (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    action_type VARCHAR(50) NOT NULL,
-    action_description TEXT,
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-);
-
--- إدراج سجل نشاطات تجريبي
-INSERT INTO activity_log (user_id, action_type, action_description, ip_address) VALUES
-(1, 'login', 'تسجيل دخول المدير إلى لوحة التحكم', '192.168.1.100'),
-(1, 'product_add', 'إضافة منتج جديد: حساب كونكر مميز', '192.168.1.100'),
-(1, 'order_update', 'تحديث حالة الطلب #1 إلى مكتمل', '192.168.1.100'),
-(2, 'login', 'تسجيل دخول مدير المبيعات', '192.168.1.101'),
-(2, 'product_edit', 'تعديل سعر المنتج #3', '192.168.1.101'),
-(1, 'user_add', 'إضافة مستخدم جديد: support1', '192.168.1.100');
-
--- إنشاء فهارس لتحسين الأداء
-CREATE INDEX idx_products_status ON products(status);
-CREATE INDEX idx_products_category ON products(category);
-CREATE INDEX idx_products_created_at ON products(created_at);
-CREATE INDEX idx_orders_status ON orders(status);
-CREATE INDEX idx_orders_created_at ON orders(created_at);
-CREATE INDEX idx_reviews_product_id ON reviews(product_id);
-CREATE INDEX idx_reviews_approved ON reviews(is_approved);
-CREATE INDEX idx_activity_log_user_id ON activity_log(user_id);
-CREATE INDEX idx_activity_log_created_at ON activity_log(created_at);
-
--- إنشاء views مفيدة للتقارير
-CREATE VIEW popular_products AS
-SELECT 
-    p.*,
-    COALESCE(AVG(r.rating), 0) as average_rating,
-    COUNT(r.id) as review_count,
-    COUNT(o.id) as order_count
-FROM products p
-LEFT JOIN reviews r ON p.id = r.product_id AND r.is_approved = TRUE
-LEFT JOIN orders o ON p.id = o.product_id
-GROUP BY p.id
-ORDER BY p.views DESC, order_count DESC;
-
-CREATE VIEW monthly_sales AS
-SELECT 
-    YEAR(created_at) as year,
-    MONTH(created_at) as month,
-    COUNT(*) as total_orders,
-    SUM(total_amount) as total_revenue,
-    AVG(total_amount) as average_order_value
-FROM orders 
-WHERE status = 'completed'
-GROUP BY YEAR(created_at), MONTH(created_at)
-ORDER BY year DESC, month DESC;
-
--- إنشاء stored procedures مفيدة
-DELIMITER //
-
-CREATE PROCEDURE GetProductStats(IN product_id INT)
-BEGIN
-    SELECT 
-        p.*,
-        COALESCE(AVG(r.rating), 0) as average_rating,
-        COUNT(DISTINCT r.id) as review_count,
-        COUNT(DISTINCT o.id) as order_count,
-        SUM(CASE WHEN o.status = 'completed' THEN o.total_amount ELSE 0 END) as total_revenue
-    FROM products p
-    LEFT JOIN reviews r ON p.id = r.product_id AND r.is_approved = TRUE
-    LEFT JOIN orders o ON p.id = o.product_id
-    WHERE p.id = product_id
-    GROUP BY p.id;
-END //
-
-CREATE PROCEDURE GetTopSellingProducts(IN limit_count INT)
-BEGIN
-    SELECT 
-        p.*,
-        COUNT(o.id) as order_count,
-        SUM(o.total_amount) as total_revenue
-    FROM products p
-    LEFT JOIN orders o ON p.id = o.product_id AND o.status = 'completed'
-    GROUP BY p.id
-    ORDER BY order_count DESC, total_revenue DESC
-    LIMIT limit_count;
-END //
-
-DELIMITER ;
+-- Update news views
+UPDATE news SET views = FLOOR(RAND() * 1000) + 100;

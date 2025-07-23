@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initProductCards()
   initNewsticker()
   initMobileMenu()
+  initHeroSlider()
+  initSmoothScrolling()
+  initLoadingAnimations()
 })
 
 // Navigation functionality
@@ -145,94 +148,189 @@ function initNewsticker() {
 
 // Mobile menu functionality
 function initMobileMenu() {
-  const navToggle = document.querySelector(".nav-toggle")
-  const navMenu = document.querySelector(".nav-menu")
+  const mobileMenuBtn = document.querySelector(".mobile-menu-btn")
+  const mobileNav = document.querySelector(".mobile-nav")
 
-  if (navToggle && navMenu) {
-    navToggle.addEventListener("click", () => {
-      navToggle.classList.toggle("active")
-      navMenu.classList.toggle("active")
-      document.body.classList.toggle("menu-open")
+  if (!mobileMenuBtn || !mobileNav) return
+
+  mobileMenuBtn.addEventListener("click", () => {
+    mobileNav.classList.toggle("active")
+    mobileMenuBtn.classList.toggle("active")
+  })
+
+  // Close mobile menu when clicking on links
+  const mobileLinks = document.querySelectorAll(".mobile-nav-link")
+  mobileLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      mobileNav.classList.remove("active")
+      mobileMenuBtn.classList.remove("active")
+    })
+  })
+
+  // Close mobile menu when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!mobileMenuBtn.contains(e.target) && !mobileNav.contains(e.target)) {
+      mobileNav.classList.remove("active")
+      mobileMenuBtn.classList.remove("active")
+    }
+  })
+}
+
+// Hero Slider
+function initHeroSlider() {
+  const slides = document.querySelectorAll(".hero-slide")
+  const indicators = document.querySelectorAll(".hero-indicators .indicator")
+  let currentSlide = 0
+
+  if (slides.length === 0) return
+
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle("active", i === index)
     })
 
-    // Close menu when clicking on a link
-    const navLinks = navMenu.querySelectorAll(".nav-link")
-    navLinks.forEach((link) => {
-      link.addEventListener("click", () => {
-        navToggle.classList.remove("active")
-        navMenu.classList.remove("active")
-        document.body.classList.remove("menu-open")
-      })
+    indicators.forEach((indicator, i) => {
+      indicator.classList.toggle("active", i === index)
     })
   }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length
+    showSlide(currentSlide)
+  }
+
+  // Auto-advance slides
+  setInterval(nextSlide, 5000)
+
+  // Manual navigation
+  indicators.forEach((indicator, index) => {
+    indicator.addEventListener("click", () => {
+      currentSlide = index
+      showSlide(currentSlide)
+    })
+  })
 }
 
-// Utility functions
-function formatPrice(price) {
-  return new Intl.NumberFormat("ar-SA", {
-    style: "currency",
-    currency: "SAR",
-    minimumFractionDigits: 0,
-  }).format(price)
+// Smooth Scrolling
+function initSmoothScrolling() {
+  const links = document.querySelectorAll('a[href^="#"]')
+
+  links.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const href = link.getAttribute("href")
+      if (href === "#") return
+
+      const target = document.querySelector(href)
+      if (target) {
+        e.preventDefault()
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        })
+      }
+    })
+  })
 }
 
-function showToast(message, type = "success") {
-  const toast = document.createElement("div")
-  toast.className = `toast toast-${type}`
-  toast.innerHTML = `
-        <div class="toast-content">
-            <i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i>
-            <span>${message}</span>
-        </div>
-    `
+// Loading Animations
+function initLoadingAnimations() {
+  // Intersection Observer for fade-in animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: "0px 0px -50px 0px",
+  }
 
-  document.body.appendChild(toast)
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = "1"
+        entry.target.style.transform = "translateY(0)"
+      }
+    })
+  }, observerOptions)
+
+  // Observe elements with fade-in class
+  const fadeElements = document.querySelectorAll('[data-aos="fade-up"]')
+  fadeElements.forEach((el) => {
+    el.style.opacity = "0"
+    el.style.transform = "translateY(30px)"
+    el.style.transition = "opacity 0.6s ease, transform 0.6s ease"
+    observer.observe(el)
+  })
+}
+
+// Utility Functions
+function showNotification(message, type = "info") {
+  const notification = document.createElement("div")
+  notification.className = `notification notification-${type}`
+  notification.textContent = message
+
+  notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === "success" ? "#10b981" : type === "error" ? "#ef4444" : "#3b82f6"};
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+  `
+
+  document.body.appendChild(notification)
 
   setTimeout(() => {
-    toast.classList.add("show")
-  }, 100)
-
-  setTimeout(() => {
-    toast.classList.remove("show")
+    notification.style.animation = "slideOut 0.3s ease"
     setTimeout(() => {
-      document.body.removeChild(toast)
+      document.body.removeChild(notification)
     }, 300)
   }, 3000)
 }
 
-// Smooth scrolling for anchor links
-function smoothScroll(target) {
-  const element = document.querySelector(target)
-  if (element) {
-    const headerHeight = document.querySelector(".header").offsetHeight
-    const elementPosition = element.offsetTop - headerHeight - 20
-
-    window.scrollTo({
-      top: elementPosition,
-      behavior: "smooth",
-    })
-  }
+function formatPrice(price) {
+  return new Intl.NumberFormat("ar-SA", {
+    style: "currency",
+    currency: "SAR",
+  }).format(price)
 }
 
-// Add ripple effect to buttons
-document.addEventListener("click", (e) => {
-  if (e.target.classList.contains("btn") || e.target.closest(".btn")) {
-    const button = e.target.classList.contains("btn") ? e.target : e.target.closest(".btn")
-    const ripple = document.createElement("span")
-    const rect = button.getBoundingClientRect()
-    const size = Math.max(rect.width, rect.height)
-    const x = e.clientX - rect.left - size / 2
-    const y = e.clientY - rect.top - size / 2
+function timeAgo(date) {
+  const now = new Date()
+  const diff = now - new Date(date)
+  const seconds = Math.floor(diff / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
 
-    ripple.style.width = ripple.style.height = size + "px"
-    ripple.style.left = x + "px"
-    ripple.style.top = y + "px"
-    ripple.classList.add("ripple-effect")
+  if (days > 0) return `منذ ${days} يوم`
+  if (hours > 0) return `منذ ${hours} ساعة`
+  if (minutes > 0) return `منذ ${minutes} دقيقة`
+  return "منذ لحظات"
+}
 
-    button.appendChild(ripple)
-
-    setTimeout(() => {
-      ripple.remove()
-    }, 600)
-  }
-})
+// Add CSS animations
+const style = document.createElement("style")
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`
+document.head.appendChild(style)

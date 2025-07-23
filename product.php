@@ -1,50 +1,58 @@
 <?php
-session_start();
+require_once 'includes/config.php';
 require_once 'includes/functions.php';
+require_once 'includes/seo_helper.php';
 
-$productId = $_GET['id'] ?? null;
-if (!$productId) {
-    redirect('index.php');
+$product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+if (!$product_id) {
+    header('Location: index.php');
+    exit;
 }
 
-$product = getProduct($productId);
+$product = getProductById($product_id);
+
 if (!$product) {
-    redirect('index.php');
+    header('Location: index.php');
+    exit;
 }
 
 // تحديث عدد المشاهدات
-updateProductViews($productId);
+updateProductViews($product_id);
 
-$images = json_decode($product['images'], true) ?? [];
-$features = json_decode($product['features'], true) ?? [];
+$seo = new SEOHelper();
+$seo->setTitle($product['title'] . ' - متجر PUBG Mobile');
+$seo->setDescription($product['description']);
+$seo->setImage($product['main_image']);
+
+// جلب صور المنتج
+$product_images = getProductImages($product_id);
 ?>
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <?php echo $seo->generateMetaTags(); ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($product['title']) ?> - متجر PUBG Mobile</title>
-    <meta name="description" content="<?= htmlspecialchars($product['description']) ?>">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/product.css">
-    <link rel="stylesheet" href="assets/css/loading.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/product.css" rel="stylesheet">
+    <link href="assets/css/loading.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
-    <!-- Page Loader -->
-    <div id="pageLoader" class="page-loader">
-        <div class="loader-container">
+<body class="bg-black text-white">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
             <div class="pubg-logo">
-                <i class="fas fa-gamepad"></i>
+                <img src="public/placeholder-logo.png" alt="PUBG Mobile" class="logo-img">
             </div>
-            <div class="loader-rings">
-                <div class="ring ring-1"></div>
-                <div class="ring ring-2"></div>
-                <div class="ring ring-3"></div>
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
             </div>
-            <div class="loader-text">جاري تحميل تفاصيل المنتج...</div>
+            <h2 class="loading-text">جاري تحميل تفاصيل المنتج...</h2>
             <div class="progress-bar">
                 <div class="progress-fill"></div>
             </div>
@@ -52,78 +60,72 @@ $features = json_decode($product['features'], true) ?? [];
     </div>
 
     <!-- Header -->
-    <header class="header">
-        <nav class="navbar">
-            <div class="container">
-                <div class="nav-brand">
-                    <i class="fas fa-gamepad"></i>
-                    <span>PUBG Store</span>
-                </div>
-                <div class="nav-actions">
-                    <a href="index.php" class="btn btn-back">
-                        <i class="fas fa-arrow-right"></i>
-                        العودة
-                    </a>
+    <div class="product-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.php" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> العودة
+                </a>
+                <div class="header-actions">
+                    <button class="favorite-btn" onclick="toggleFavorite(<?php echo $product['id']; ?>)">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    <button class="share-btn" onclick="shareProduct()">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
                 </div>
             </div>
-        </nav>
-    </header>
+        </div>
+    </div>
 
     <!-- Product Details -->
-    <main class="product-details">
+    <div class="product-details">
         <div class="container">
             <div class="product-layout">
                 <!-- Image Gallery -->
                 <div class="product-gallery">
                     <div class="main-image">
-                        <img id="mainImage" src="<?= $images[0] ?? 'assets/images/placeholder.jpg' ?>" 
-                             alt="<?= htmlspecialchars($product['title']) ?>">
-                        <div class="product-rank"><?= htmlspecialchars($product['rank_name']) ?></div>
+                        <img id="main-product-image" 
+                             src="<?php echo $product['main_image'] ?: 'public/placeholder.jpg'; ?>" 
+                             alt="<?php echo htmlspecialchars($product['title']); ?>">
+                        <div class="product-rank"><?php echo htmlspecialchars($product['rank']); ?></div>
                     </div>
-                    <div class="thumbnail-gallery">
-                        <?php foreach ($images as $index => $image): ?>
-                            <img src="<?= $image ?>" 
-                                 alt="صورة <?= $index + 1 ?>" 
-                                 class="thumbnail <?= $index === 0 ? 'active' : '' ?>"
-                                 onclick="changeMainImage('<?= $image ?>', this)">
+                    
+                    <div class="image-thumbnails">
+                        <?php foreach ($product_images as $index => $image): ?>
+                            <button class="thumbnail <?php echo $index === 0 ? 'active' : ''; ?>" 
+                                    onclick="changeMainImage('<?php echo $image['image_url']; ?>', this)">
+                                <img src="<?php echo $image['image_url']; ?>" 
+                                     alt="<?php echo htmlspecialchars($product['title']); ?> - صورة <?php echo $index + 1; ?>">
+                            </button>
                         <?php endforeach; ?>
                     </div>
                 </div>
 
                 <!-- Product Info -->
                 <div class="product-info">
-                    <div class="product-header">
-                        <h1 class="product-title"><?= htmlspecialchars($product['title']) ?></h1>
-                        <div class="product-actions-header">
-                            <button class="btn-icon" onclick="toggleFavorite()">
-                                <i class="fas fa-heart" id="favoriteIcon"></i>
-                            </button>
-                            <button class="btn-icon" onclick="shareProduct()">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <p class="product-description"><?= htmlspecialchars($product['description']) ?></p>
+                    <h1 class="product-title"><?php echo htmlspecialchars($product['title']); ?></h1>
+                    <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>
 
                     <!-- Price and Stats -->
                     <div class="product-stats">
                         <div class="price-section">
-                            <span class="price"><?= formatPrice($product['price']) ?></span>
-                            <div class="level-info">
+                            <div class="product-price"><?php echo number_format($product['price']); ?> ريال</div>
+                            <div class="product-level">
                                 <i class="fas fa-star"></i>
-                                <span>المستوى <?= $product['level'] ?></span>
+                                <span>المستوى <?php echo $product['level']; ?></span>
                             </div>
                         </div>
 
-                        <div class="stats-grid">
+                        <!-- Quick Stats -->
+                        <div class="quick-stats">
                             <div class="stat-item">
-                                <i class="fas fa-medal"></i>
-                                <span>الرتبة: <?= htmlspecialchars($product['rank_name']) ?></span>
+                                <i class="fas fa-trophy"></i>
+                                <span>الرتبة: <?php echo htmlspecialchars($product['rank']); ?></span>
                             </div>
                             <div class="stat-item">
                                 <i class="fas fa-users"></i>
-                                <span><?= $product['skins_count'] ?>+ سكن</span>
+                                <span><?php echo $product['skins_count']; ?>+ سكن</span>
                             </div>
                             <div class="stat-item">
                                 <i class="fas fa-shield-alt"></i>
@@ -137,46 +139,40 @@ $features = json_decode($product['features'], true) ?? [];
 
                         <!-- Action Buttons -->
                         <div class="action-buttons">
-                            <button class="btn btn-whatsapp btn-loading" onclick="contactWhatsApp()">
-                                <span class="btn-text">
-                                    <i class="fab fa-whatsapp"></i>
-                                    تواصل عبر واتساب
-                                </span>
-                                <span class="btn-loader">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    جاري الاتصال...
-                                </span>
+                            <button class="whatsapp-btn loading-btn" 
+                                    onclick="contactWhatsApp('<?php echo htmlspecialchars($product['title']); ?>', <?php echo $product['price']; ?>)">
+                                <i class="fab fa-whatsapp"></i>
+                                <span class="btn-text">تواصل عبر واتساب</span>
+                                <span class="btn-loading">جاري الاتصال...</span>
                             </button>
-                            <button class="btn btn-buy btn-loading" onclick="buyNow()">
-                                <span class="btn-text">
-                                    <i class="fas fa-shopping-cart"></i>
-                                    شراء الآن
-                                </span>
-                                <span class="btn-loader">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    جاري المعالجة...
-                                </span>
+                            <button class="buy-btn loading-btn" onclick="buyNow(<?php echo $product['id']; ?>)">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="btn-text">شراء الآن</span>
+                                <span class="btn-loading">جاري المعالجة...</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Features -->
-                    <div class="features-section">
+                    <div class="product-features">
                         <h3>مميزات الحساب</h3>
                         <div class="features-list">
-                            <?php foreach ($features as $feature): ?>
+                            <?php 
+                            $features = json_decode($product['features'], true) ?: [];
+                            foreach ($features as $feature): 
+                            ?>
                                 <div class="feature-item">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span><?= htmlspecialchars($feature) ?></span>
+                                    <div class="feature-dot"></div>
+                                    <span><?php echo htmlspecialchars($feature); ?></span>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
 
                     <!-- Weapons & Items -->
-                    <div class="weapons-section">
+                    <div class="product-weapons">
                         <h3>الأسلحة والعناصر</h3>
-                        <p><?= htmlspecialchars($product['weapons']) ?></p>
+                        <p><?php echo htmlspecialchars($product['weapons']); ?></p>
                     </div>
 
                     <!-- Security Notice -->
@@ -190,45 +186,63 @@ $features = json_decode($product['features'], true) ?? [];
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <!-- Related Products -->
-    <section class="related-products">
-        <div class="container">
-            <h2>منتجات مشابهة</h2>
-            <div class="products-grid">
-                <?php
-                $relatedProducts = getProducts(4, $product['category']);
-                foreach ($relatedProducts as $related):
-                    if ($related['id'] == $product['id']) continue;
-                ?>
-                    <div class="product-card">
-                        <div class="product-image">
-                            <img src="<?= json_decode($related['images'])[0] ?? 'assets/images/placeholder.jpg' ?>" 
-                                 alt="<?= htmlspecialchars($related['title']) ?>">
-                            <div class="product-rank"><?= htmlspecialchars($related['rank_name']) ?></div>
-                        </div>
-                        <div class="product-info">
-                            <h3><?= htmlspecialchars($related['title']) ?></h3>
-                            <div class="product-price"><?= formatPrice($related['price']) ?></div>
-                            <a href="product.php?id=<?= $related['id'] ?>" class="btn btn-primary">عرض التفاصيل</a>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </section>
+    <!-- Footer -->
+    <?php include 'includes/footer.php'; ?>
 
+    <!-- Scripts -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/product.js"></script>
     <script src="assets/js/loading.js"></script>
     <script>
-        const productData = {
-            id: <?= $product['id'] ?>,
-            title: '<?= addslashes($product['title']) ?>',
-            price: '<?= formatPrice($product['price']) ?>',
-            whatsapp: '<?= $product['whatsapp_number'] ?>'
-        };
+        function changeMainImage(imageSrc, thumbnail) {
+            document.getElementById('main-product-image').src = imageSrc;
+            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+            thumbnail.classList.add('active');
+        }
+
+        function contactWhatsApp(title, price) {
+            const btn = document.querySelector('.whatsapp-btn');
+            btn.classList.add('loading');
+            
+            setTimeout(() => {
+                const message = `مرحباً، أريد شراء الحساب: ${title} - السعر: ${price} ريال`;
+                const whatsappUrl = `https://wa.me/967777826667?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+                btn.classList.remove('loading');
+            }, 1000);
+        }
+
+        function buyNow(productId) {
+            const btn = document.querySelector('.buy-btn');
+            btn.classList.add('loading');
+            
+            setTimeout(() => {
+                // Redirect to purchase page or show purchase modal
+                alert('سيتم توجيهك لإتمام عملية الشراء');
+                btn.classList.remove('loading');
+            }, 1000);
+        }
+
+        function toggleFavorite(productId) {
+            const btn = document.querySelector('.favorite-btn i');
+            btn.classList.toggle('far');
+            btn.classList.toggle('fas');
+        }
+
+        function shareProduct() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '<?php echo htmlspecialchars($product['title']); ?>',
+                    text: 'تحقق من هذا الحساب المميز',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('تم نسخ الرابط!');
+            }
+        }
     </script>
 </body>
 </html>

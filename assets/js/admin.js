@@ -1,94 +1,103 @@
 import { Chart } from "@/components/ui/chart"
 // Admin Panel JavaScript
 document.addEventListener("DOMContentLoaded", () => {
+  // Initialize admin functionality
   initSidebar()
-  initModals()
-  initCharts()
-  initNotifications()
   initDataTables()
+  initCharts()
+  initModals()
   initFormValidation()
+  initNotifications()
 })
 
-// Sidebar functionality
+// Sidebar Management
 function initSidebar() {
-  const sidebarToggle = document.querySelector(".sidebar-toggle")
-  const sidebar = document.querySelector(".admin-sidebar")
-  const overlay = document.createElement("div")
-  overlay.className = "sidebar-overlay"
+  const sidebarItems = document.querySelectorAll(".nav-item")
+  const currentPath = window.location.pathname
 
-  if (sidebarToggle) {
-    sidebarToggle.addEventListener("click", () => {
-      sidebar.classList.toggle("active")
-      document.body.appendChild(overlay)
-      overlay.classList.add("active")
-    })
-  }
-
-  // Close sidebar when clicking overlay
-  overlay.addEventListener("click", () => {
-    sidebar.classList.remove("active")
-    overlay.classList.remove("active")
-    document.body.removeChild(overlay)
-  })
-
-  // Active nav item
-  const currentPage = window.location.pathname.split("/").pop()
-  const navLinks = document.querySelectorAll(".nav-link")
-
-  navLinks.forEach((link) => {
-    const href = link.getAttribute("href")
-    if (href === currentPage || (currentPage === "" && href === "index.php")) {
-      link.closest(".nav-item").classList.add("active")
+  sidebarItems.forEach((item) => {
+    const href = item.getAttribute("href")
+    if (href && currentPath.includes(href)) {
+      item.classList.add("active")
     }
-  })
-}
 
-// Modal functionality
-function initModals() {
-  const modals = document.querySelectorAll(".modal")
-
-  modals.forEach((modal) => {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        closeModal(modal.id)
-      }
+    item.addEventListener("click", function (e) {
+      // Remove active class from all items
+      sidebarItems.forEach((i) => i.classList.remove("active"))
+      // Add active class to clicked item
+      this.classList.add("active")
     })
   })
+}
 
-  // Close modal with Escape key
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      const activeModal = document.querySelector(".modal.show")
-      if (activeModal) {
-        closeModal(activeModal.id)
-      }
+// Data Tables
+function initDataTables() {
+  const tables = document.querySelectorAll(".data-table")
+
+  tables.forEach((table) => {
+    // Add sorting functionality
+    const headers = table.querySelectorAll("th[data-sort]")
+    headers.forEach((header) => {
+      header.style.cursor = "pointer"
+      header.addEventListener("click", () => sortTable(table, header))
+    })
+
+    // Add search functionality
+    const searchInput = table.parentElement.querySelector(".table-search")
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => filterTable(table, e.target.value))
     }
   })
 }
 
-function showModal(modalId) {
-  const modal = document.getElementById(modalId)
-  if (modal) {
-    modal.classList.add("show")
-    document.body.style.overflow = "hidden"
-  }
-}
+function sortTable(table, header) {
+  const tbody = table.querySelector("tbody")
+  const rows = Array.from(tbody.querySelectorAll("tr"))
+  const columnIndex = Array.from(header.parentElement.children).indexOf(header)
+  const sortType = header.dataset.sort
+  const isAscending = !header.classList.contains("sort-asc")
 
-function closeModal(modalId) {
-  const modal = document.getElementById(modalId)
-  if (modal) {
-    modal.classList.remove("show")
-    document.body.style.overflow = "auto"
+  // Remove sort classes from all headers
+  table.querySelectorAll("th").forEach((th) => {
+    th.classList.remove("sort-asc", "sort-desc")
+  })
 
-    // Reset form if exists
-    const form = modal.querySelector("form")
-    if (form) {
-      form.reset()
+  // Add sort class to current header
+  header.classList.add(isAscending ? "sort-asc" : "sort-desc")
+
+  rows.sort((a, b) => {
+    const aValue = a.children[columnIndex].textContent.trim()
+    const bValue = b.children[columnIndex].textContent.trim()
+
+    let comparison = 0
+
+    if (sortType === "number") {
+      comparison = Number.parseFloat(aValue) - Number.parseFloat(bValue)
+    } else if (sortType === "date") {
+      comparison = new Date(aValue) - new Date(bValue)
+    } else {
+      comparison = aValue.localeCompare(bValue, "ar")
     }
-  }
+
+    return isAscending ? comparison : -comparison
+  })
+
+  // Reorder rows
+  rows.forEach((row) => tbody.appendChild(row))
 }
 
-// Charts initialization
+function filterTable(table, searchTerm) {
+  const tbody = table.querySelector("tbody")
+  const rows = tbody.querySelectorAll("tr")
+
+  rows.forEach((row) => {
+    const text = row.textContent.toLowerCase()
+    const matches = text.includes(searchTerm.toLowerCase())
+    row.style.display = matches ? "" : "none"
+  })
+}
+
+// Charts
 function initCharts() {
   // Sales Chart
   const salesCtx = document.getElementById("salesChart")
@@ -101,10 +110,11 @@ function initCharts() {
           {
             label: "المبيعات",
             data: [12000, 19000, 15000, 25000, 22000, 30000],
-            borderColor: "#ffc107",
-            backgroundColor: "rgba(255, 193, 7, 0.1)",
-            tension: 0.4,
+            borderColor: "#f59e0b",
+            backgroundColor: "rgba(245, 158, 11, 0.1)",
+            borderWidth: 3,
             fill: true,
+            tension: 0.4,
           },
         ],
       },
@@ -119,8 +129,19 @@ function initCharts() {
         scales: {
           y: {
             beginAtZero: true,
+            grid: {
+              color: "rgba(255, 255, 255, 0.1)",
+            },
             ticks: {
-              callback: (value) => value.toLocaleString("ar-SA") + " ريال",
+              color: "#64748b",
+            },
+          },
+          x: {
+            grid: {
+              color: "rgba(255, 255, 255, 0.1)",
+            },
+            ticks: {
+              color: "#64748b",
             },
           },
         },
@@ -134,11 +155,11 @@ function initCharts() {
     new Chart(productsCtx, {
       type: "doughnut",
       data: {
-        labels: ["كونكر", "مميز", "متنوع"],
+        labels: ["كونكر", "آيس", "كراون", "دايموند", "أخرى"],
         datasets: [
           {
-            data: [30, 45, 25],
-            backgroundColor: ["#e74c3c", "#9b59b6", "#3498db"],
+            data: [30, 25, 20, 15, 10],
+            backgroundColor: ["#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ef4444"],
             borderWidth: 0,
           },
         ],
@@ -149,6 +170,10 @@ function initCharts() {
         plugins: {
           legend: {
             position: "bottom",
+            labels: {
+              color: "#e2e8f0",
+              padding: 20,
+            },
           },
         },
       },
@@ -156,149 +181,75 @@ function initCharts() {
   }
 }
 
-// Notifications
-function initNotifications() {
-  const notificationBtn = document.querySelector(".notification-btn")
+// Modals
+function initModals() {
+  const modals = document.querySelectorAll(".modal")
+  const modalTriggers = document.querySelectorAll("[data-modal]")
+  const modalCloses = document.querySelectorAll(".modal-close")
 
-  if (notificationBtn) {
-    notificationBtn.addEventListener("click", () => {
-      showNotifications()
+  modalTriggers.forEach((trigger) => {
+    trigger.addEventListener("click", (e) => {
+      e.preventDefault()
+      const modalId = trigger.dataset.modal
+      const modal = document.getElementById(modalId)
+      if (modal) {
+        showModal(modal)
+      }
     })
-  }
+  })
+
+  modalCloses.forEach((close) => {
+    close.addEventListener("click", (e) => {
+      e.preventDefault()
+      const modal = close.closest(".modal")
+      if (modal) {
+        hideModal(modal)
+      }
+    })
+  })
+
+  // Close modal on backdrop click
+  modals.forEach((modal) => {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        hideModal(modal)
+      }
+    })
+  })
 }
 
-function showNotifications() {
-  const notifications = [
-    { type: "order", message: "طلب جديد من أحمد محمد", time: "منذ 5 دقائق" },
-    { type: "product", message: "تم إضافة منتج جديد", time: "منذ 15 دقيقة" },
-    { type: "user", message: "مستخدم جديد سجل", time: "منذ ساعة" },
-  ]
+function showModal(modal) {
+  modal.style.display = "flex"
+  document.body.style.overflow = "hidden"
 
-  // Create notification dropdown
-  const dropdown = document.createElement("div")
-  dropdown.className = "notifications-dropdown"
-  dropdown.innerHTML = `
-        <div class="notifications-header">
-            <h4>الإشعارات</h4>
-            <button onclick="markAllAsRead()">تعيين الكل كمقروء</button>
-        </div>
-        <div class="notifications-list">
-            ${notifications
-              .map(
-                (notif) => `
-                <div class="notification-item">
-                    <div class="notification-icon ${notif.type}">
-                        <i class="fas fa-${getNotificationIcon(notif.type)}"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p>${notif.message}</p>
-                        <span>${notif.time}</span>
-                    </div>
-                </div>
-            `,
-              )
-              .join("")}
-        </div>
-        <div class="notifications-footer">
-            <a href="notifications.php">عرض جميع الإشعارات</a>
-        </div>
-    `
+  // Animate in
+  requestAnimationFrame(() => {
+    modal.classList.add("show")
+  })
+}
 
-  document.body.appendChild(dropdown)
+function hideModal(modal) {
+  modal.classList.remove("show")
 
-  // Position dropdown
-  const btn = document.querySelector(".notification-btn")
-  const rect = btn.getBoundingClientRect()
-  dropdown.style.top = rect.bottom + 10 + "px"
-  dropdown.style.left = rect.left - 200 + "px"
-
-  // Close on outside click
   setTimeout(() => {
-    document.addEventListener("click", function closeDropdown(e) {
-      if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
-        dropdown.remove()
-        document.removeEventListener("click", closeDropdown)
-      }
-    })
-  }, 100)
+    modal.style.display = "none"
+    document.body.style.overflow = ""
+  }, 300)
 }
 
-function getNotificationIcon(type) {
-  const icons = {
-    order: "shopping-cart",
-    product: "box",
-    user: "user",
-    system: "cog",
-  }
-  return icons[type] || "bell"
-}
-
-// Data tables functionality
-function initDataTables() {
-  const tables = document.querySelectorAll(".data-table")
-
-  tables.forEach((table) => {
-    // Add sorting functionality
-    const headers = table.querySelectorAll("th")
-    headers.forEach((header, index) => {
-      if (header.textContent.trim() && index < headers.length - 1) {
-        header.style.cursor = "pointer"
-        header.addEventListener("click", () => sortTable(table, index))
-      }
-    })
-  })
-}
-
-function sortTable(table, column) {
-  const tbody = table.querySelector("tbody")
-  const rows = Array.from(tbody.querySelectorAll("tr"))
-  const isAscending = table.dataset.sortOrder !== "asc"
-
-  rows.sort((a, b) => {
-    const aText = a.cells[column].textContent.trim()
-    const bText = b.cells[column].textContent.trim()
-
-    // Check if numeric
-    const aNum = Number.parseFloat(aText.replace(/[^\d.-]/g, ""))
-    const bNum = Number.parseFloat(bText.replace(/[^\d.-]/g, ""))
-
-    if (!isNaN(aNum) && !isNaN(bNum)) {
-      return isAscending ? aNum - bNum : bNum - aNum
-    }
-
-    return isAscending ? aText.localeCompare(bText, "ar") : bText.localeCompare(aText, "ar")
-  })
-
-  rows.forEach((row) => tbody.appendChild(row))
-  table.dataset.sortOrder = isAscending ? "asc" : "desc"
-
-  // Update header indicators
-  const headers = table.querySelectorAll("th")
-  headers.forEach((h) => h.classList.remove("sort-asc", "sort-desc"))
-  headers[column].classList.add(isAscending ? "sort-asc" : "sort-desc")
-}
-
-// Form validation
+// Form Validation
 function initFormValidation() {
-  const forms = document.querySelectorAll("form")
+  const forms = document.querySelectorAll(".admin-form")
 
   forms.forEach((form) => {
     form.addEventListener("submit", (e) => {
       if (!validateForm(form)) {
         e.preventDefault()
-        return false
-      }
-
-      // Show loading state
-      const submitBtn = form.querySelector('button[type="submit"]')
-      if (submitBtn) {
-        submitBtn.classList.add("loading")
-        submitBtn.disabled = true
       }
     })
 
     // Real-time validation
-    const inputs = form.querySelectorAll("input, select, textarea")
+    const inputs = form.querySelectorAll("input, textarea, select")
     inputs.forEach((input) => {
       input.addEventListener("blur", () => validateField(input))
       input.addEventListener("input", () => clearFieldError(input))
@@ -308,7 +259,7 @@ function initFormValidation() {
 
 function validateForm(form) {
   let isValid = true
-  const inputs = form.querySelectorAll("input[required], select[required], textarea[required]")
+  const inputs = form.querySelectorAll("input[required], textarea[required], select[required]")
 
   inputs.forEach((input) => {
     if (!validateField(input)) {
@@ -332,56 +283,50 @@ function validateField(field) {
   }
 
   // Email validation
-  else if (type === "email" && value && !isValidEmail(value)) {
+  if (type === "email" && value && !isValidEmail(value)) {
     isValid = false
     message = "يرجى إدخال بريد إلكتروني صحيح"
   }
 
   // Number validation
-  else if (type === "number" && value) {
-    const min = field.getAttribute("min")
-    const max = field.getAttribute("max")
-    const numValue = Number.parseFloat(value)
-
-    if (isNaN(numValue)) {
-      isValid = false
-      message = "يرجى إدخال رقم صحيح"
-    } else if (min && numValue < Number.parseFloat(min)) {
-      isValid = false
-      message = `القيمة يجب أن تكون أكبر من ${min}`
-    } else if (max && numValue > Number.parseFloat(max)) {
-      isValid = false
-      message = `القيمة يجب أن تكون أصغر من ${max}`
-    }
-  }
-
-  // Phone validation
-  else if (field.name === "phone" && value && !isValidPhone(value)) {
+  if (type === "number" && value && isNaN(value)) {
     isValid = false
-    message = "يرجى إدخال رقم هاتف صحيح"
+    message = "يرجى إدخال رقم صحيح"
   }
 
-  showFieldError(field, isValid ? "" : message)
+  // URL validation
+  if (type === "url" && value && !isValidURL(value)) {
+    isValid = false
+    message = "يرجى إدخال رابط صحيح"
+  }
+
+  if (isValid) {
+    clearFieldError(field)
+  } else {
+    showFieldError(field, message)
+  }
+
   return isValid
 }
 
 function showFieldError(field, message) {
   clearFieldError(field)
 
-  if (message) {
-    field.classList.add("error")
-    const errorDiv = document.createElement("div")
-    errorDiv.className = "field-error"
-    errorDiv.textContent = message
-    field.parentNode.appendChild(errorDiv)
-  }
+  field.classList.add("error")
+
+  const errorDiv = document.createElement("div")
+  errorDiv.className = "field-error"
+  errorDiv.textContent = message
+
+  field.parentNode.appendChild(errorDiv)
 }
 
 function clearFieldError(field) {
   field.classList.remove("error")
-  const existingError = field.parentNode.querySelector(".field-error")
-  if (existingError) {
-    existingError.remove()
+
+  const errorDiv = field.parentNode.querySelector(".field-error")
+  if (errorDiv) {
+    errorDiv.remove()
   }
 }
 
@@ -390,326 +335,69 @@ function isValidEmail(email) {
   return emailRegex.test(email)
 }
 
-function isValidPhone(phone) {
-  const phoneRegex = /^[+]?[0-9\s\-$$$$]{10,}$/
-  return phoneRegex.test(phone)
-}
-
-// Product management functions
-function showAddProductModal() {
-  const modal = document.getElementById("productModal") || document.getElementById("addProductModal")
-  const form = modal.querySelector("form")
-  const title = modal.querySelector("#modalTitle") || modal.querySelector("h3")
-
-  if (title) title.textContent = "إضافة منتج جديد"
-  if (form) {
-    form.reset()
-    form.querySelector('input[name="action"]').value = "add"
-    form.querySelector('input[name="id"]').value = ""
-
-    const statusGroup = form.querySelector("#statusGroup")
-    if (statusGroup) statusGroup.style.display = "none"
+function isValidURL(url) {
+  try {
+    new URL(url)
+    return true
+  } catch {
+    return false
   }
-
-  showModal(modal.id)
 }
 
-function editProduct(id) {
-  // Fetch product data and populate form
-  fetch(`api/get_product.php?id=${id}`)
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        populateProductForm(data.product, "edit")
-        showModal("productModal")
-      } else {
-        showAlert("خطأ في جلب بيانات المنتج", "error")
-      }
-    })
-    .catch((error) => {
-      console.error("Error:", error)
-      showAlert("حدث خطأ في الاتصال", "error")
-    })
-}
+// Notifications
+function initNotifications() {
+  // Auto-hide notifications
+  const notifications = document.querySelectorAll(".notification")
+  notifications.forEach((notification) => {
+    setTimeout(() => {
+      hideNotification(notification)
+    }, 5000)
 
-function populateProductForm(product, action) {
-  const modal = document.getElementById("productModal")
-  const form = modal.querySelector("form")
-  const title = modal.querySelector("#modalTitle")
-
-  if (title) title.textContent = action === "edit" ? "تعديل المنتج" : "إضافة منتج جديد"
-
-  // Populate form fields
-  Object.keys(product).forEach((key) => {
-    const field = form.querySelector(`[name="${key}"]`)
-    if (field) {
-      if (field.type === "checkbox") {
-        field.checked = product[key]
-      } else {
-        field.value = product[key]
-      }
+    const closeBtn = notification.querySelector(".notification-close")
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => hideNotification(notification))
     }
   })
-
-  form.querySelector('input[name="action"]').value = action
-  form.querySelector('input[name="id"]').value = product.id || ""
-
-  const statusGroup = form.querySelector("#statusGroup")
-  if (statusGroup) {
-    statusGroup.style.display = action === "edit" ? "block" : "none"
-  }
 }
 
-function deleteProduct(id) {
-  if (confirm("هل أنت متأكد من حذف هذا المنتج؟")) {
-    const formData = new FormData()
-    formData.append("action", "delete")
-    formData.append("id", id)
+function showNotification(message, type = "info", duration = 5000) {
+  const notification = document.createElement("div")
+  notification.className = `notification notification-${type}`
 
-    fetch("products.php", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.text())
-      .then(() => {
-        showAlert("تم حذف المنتج بنجاح", "success")
-        setTimeout(() => location.reload(), 1500)
-      })
-      .catch((error) => {
-        console.error("Error:", error)
-        showAlert("حدث خطأ في حذف المنتج", "error")
-      })
-  }
-}
+  const icon = getNotificationIcon(type)
 
-// News management
-function showAddNewsModal() {
-  const modal = document.getElementById("newsModal")
-  if (modal) {
-    const form = modal.querySelector("form")
-    if (form) form.reset()
-    showModal("newsModal")
-  }
-}
-
-// Export functionality
-function exportData() {
-  const exportOptions = [
-    { label: "تصدير المنتجات", action: "products" },
-    { label: "تصدير الطلبات", action: "orders" },
-    { label: "تصدير المستخدمين", action: "users" },
-    { label: "تصدير التقرير الشامل", action: "full_report" },
-  ]
-
-  const modal = document.createElement("div")
-  modal.className = "modal show"
-  modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>تصدير البيانات</h3>
-                <button class="modal-close" onclick="this.closest('.modal').remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-form">
-                <p>اختر نوع البيانات المراد تصديرها:</p>
-                <div class="export-options">
-                    ${exportOptions
-                      .map(
-                        (option) => `
-                        <button class="btn btn-secondary export-btn" data-action="${option.action}">
-                            <i class="fas fa-download"></i>
-                            ${option.label}
-                        </button>
-                    `,
-                      )
-                      .join("")}
-                </div>
-            </div>
+  notification.innerHTML = `
+        <div class="notification-content">
+            <i class="${icon}"></i>
+            <span>${message}</span>
         </div>
-    `
-
-  document.body.appendChild(modal)
-
-  // Add event listeners
-  modal.querySelectorAll(".export-btn").forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const action = this.dataset.action
-      window.open(`api/export.php?type=${action}`, "_blank")
-      modal.remove()
-    })
-  })
-}
-
-// Alert system
-function showAlert(message, type = "info") {
-  const alert = document.createElement("div")
-  alert.className = `alert alert-${type} alert-floating`
-  alert.innerHTML = `
-        <i class="fas fa-${getAlertIcon(type)}"></i>
-        <span>${message}</span>
-        <button class="alert-close" onclick="this.parentElement.remove()">
+        <button class="notification-close">
             <i class="fas fa-times"></i>
         </button>
     `
 
-  document.body.appendChild(alert)
+  document.body.appendChild(notification)
 
-  // Auto remove after 5 seconds
+  // Animate in
+  requestAnimationFrame(() => {
+    notification.classList.add("show")
+  })
+
+  // Auto-hide
   setTimeout(() => {
-    if (alert.parentElement) {
-      alert.remove()
-    }
-  }, 5000)
-}
+    hideNotification(notification)
+  }, duration)
 
-function getAlertIcon(type) {
-  const icons = {
-    success: "check-circle",
-    error: "exclamation-circle",
-    warning: "exclamation-triangle",
-    info: "info-circle",
-  }
-  return icons[type] || "info-circle"
-}
-
-// Utility functions
-function formatPrice(price) {
-  return new Intl.NumberFormat("ar-SA", {
-    style: "currency",
-    currency: "SAR",
-    minimumFractionDigits: 0,
-  }).format(price)
-}
-
-function formatDate(dateString) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString("ar-SA", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  // Close button
+  notification.querySelector(".notification-close").addEventListener("click", () => {
+    hideNotification(notification)
   })
 }
 
-function debounce(func, wait) {
-  let timeout
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout)
-      func(...args)
-    }
-    clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-  }
-}
-
-// Search functionality
-const searchInput = document.querySelector('input[name="search"]')
-if (searchInput) {
-  searchInput.addEventListener(
-    "input",
-    debounce(function () {
-      const searchTerm = this.value.toLowerCase()
-      const rows = document.querySelectorAll(".data-table tbody tr")
-
-      rows.forEach((row) => {
-        const text = row.textContent.toLowerCase()
-        row.style.display = text.includes(searchTerm) ? "" : "none"
-      })
-    }, 300),
-  )
-}
-
-// Auto-save functionality for forms
-function initAutoSave() {
-  const forms = document.querySelectorAll("form[data-autosave]")
-
-  forms.forEach((form) => {
-    const inputs = form.querySelectorAll("input, select, textarea")
-    const formId = form.id || "form_" + Date.now()
-
-    // Load saved data
-    const savedData = localStorage.getItem(`autosave_${formId}`)
-    if (savedData) {
-      const data = JSON.parse(savedData)
-      Object.keys(data).forEach((key) => {
-        const field = form.querySelector(`[name="${key}"]`)
-        if (field && field.type !== "password") {
-          field.value = data[key]
+function hideNotification(notification) {
+    notification.classList.remove('show');
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
         }
-      })
-    }
-
-    // Save on input
-    inputs.forEach((input) => {
-      input.addEventListener(
-        "input",
-        debounce(() => {
-          const formData = new FormData(form)
-          const data = {}
-          for (const [key, value] of formData.entries()) {
-            if (key !== "password") {
-              data[key] = value
-            }
-          }
-          localStorage.setItem(`autosave_${formId}`, JSON.stringify(data))
-        }, 1000),
-      )
-    })
-
-    // Clear on successful submit
-    form.addEventListener("submit", () => {
-      localStorage.removeItem(`autosave_${formId}`)
-    })
-  })
-}
-
-// Initialize auto-save
-initAutoSave()
-
-// Keyboard shortcuts
-document.addEventListener("keydown", (e) => {
-  // Ctrl/Cmd + S to save form
-  if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-    e.preventDefault()
-    const activeForm = document.querySelector("form:focus-within")
-    if (activeForm) {
-      const submitBtn = activeForm.querySelector('button[type="submit"]')
-      if (submitBtn) submitBtn.click()
-    }
-  }
-
-  // Ctrl/Cmd + N to add new item
-  if ((e.ctrlKey || e.metaKey) && e.key === "n") {
-    e.preventDefault()
-    const addBtn = document.querySelector('[onclick*="showAdd"], [onclick*="Add"]')
-    if (addBtn) addBtn.click()
-  }
-})
-
-// Performance monitoring
-function initPerformanceMonitoring() {
-  // Monitor page load time
-  window.addEventListener("load", () => {
-    const loadTime = performance.now()
-    console.log(`Page loaded in ${loadTime.toFixed(2)}ms`)
-
-    // Send to analytics if needed
-    if (loadTime > 3000) {
-      console.warn("Slow page load detected")
-    }
-  })
-
-  // Monitor memory usage
-  if ("memory" in performance) {
-    setInterval(() => {
-      const memory = performance.memory
-      if (memory.usedJSHeapSize > 50 * 1024 * 1024) {
-        // 50MB
-        console.warn("High memory usage detected")
-      }
-    }, 30000)
-  }
-}
-
-initPerformanceMonitoring()

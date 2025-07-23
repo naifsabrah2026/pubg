@@ -1,242 +1,187 @@
 <?php
-session_start();
+require_once 'includes/config.php';
 require_once 'includes/functions.php';
+require_once 'includes/seo_helper.php';
 
-$products = getProducts(6);
-$news = getNews(3);
+$seo = new SEOHelper();
+$seo->setTitle('متجر حسابات PUBG Mobile - أفضل الحسابات المميزة');
+$seo->setDescription('متجر متخصص في بيع حسابات PUBG Mobile المميزة بأسعار منافسة. حسابات كونكر وآيس وكراون مضمونة 100%');
+$seo->setKeywords('PUBG Mobile, حسابات ببجي, كونكر, آيس, كراون, متجر حسابات');
+
+// جلب المنتجات المميزة
+$featured_products = getFeaturedProducts(6);
+$news_items = getActiveNews();
 ?>
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <?php echo $seo->generateMetaTags(); ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر حسابات PUBG Mobile - أفضل الحسابات المميزة</title>
-    <meta name="description" content="متجر متخصص في بيع حسابات PUBG Mobile المميزة بأفضل الأسعار. حسابات كونكر، آيس، كراون وأكثر مع ضمان الجودة والأمان.">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/loading.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/loading.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
-    <!-- Page Loader -->
-    <div id="pageLoader" class="page-loader">
-        <div class="loader-container">
+<body class="bg-black text-white">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
             <div class="pubg-logo">
-                <i class="fas fa-gamepad"></i>
+                <img src="public/placeholder-logo.png" alt="PUBG Mobile" class="logo-img">
             </div>
-            <div class="loader-rings">
-                <div class="ring ring-1"></div>
-                <div class="ring ring-2"></div>
-                <div class="ring ring-3"></div>
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
             </div>
-            <div class="loader-text">مرحباً بك في متجر PUBG Mobile</div>
+            <h2 class="loading-text">مرحباً بك في متجر PUBG Mobile</h2>
             <div class="progress-bar">
                 <div class="progress-fill"></div>
             </div>
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-    </div>
-
-    <!-- Navigation Loader -->
-    <div id="navLoader" class="nav-loader">
-        <div class="nav-progress"></div>
     </div>
 
     <!-- Header -->
-    <header class="header">
-        <nav class="navbar">
-            <div class="container">
-                <div class="nav-brand">
-                    <i class="fas fa-gamepad"></i>
-                    <span>PUBG Store</span>
-                </div>
-                <ul class="nav-menu">
-                    <li><a href="index.php" class="nav-link active">الرئيسية</a></li>
-                    <li><a href="products.php" class="nav-link">الحسابات</a></li>
-                    <li><a href="about.php" class="nav-link">من نحن</a></li>
-                    <li><a href="contact.php" class="nav-link">اتصل بنا</a></li>
-                    <?php if (isAdmin()): ?>
-                        <li><a href="admin/" class="nav-link">لوحة الإدارة</a></li>
-                    <?php endif; ?>
-                </ul>
-                <div class="nav-toggle">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <?php include 'includes/header.php'; ?>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-background">
-            <div class="hero-particles"></div>
-        </div>
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title">أفضل حسابات PUBG Mobile</h1>
-                <p class="hero-subtitle">احصل على حسابك المميز بأفضل الأسعار وضمان الجودة</p>
-                <div class="hero-buttons">
-                    <a href="products.php" class="btn btn-primary">تصفح الحسابات</a>
-                    <a href="#contact" class="btn btn-secondary">تواصل معنا</a>
-                </div>
+    <section class="hero-section">
+        <div class="hero-slider">
+            <div class="hero-slide active">
+                <img src="public/placeholder.jpg" alt="PUBG Banner 1" class="hero-image">
+                <div class="hero-overlay"></div>
             </div>
+            <div class="hero-slide">
+                <img src="public/placeholder.jpg" alt="PUBG Banner 2" class="hero-image">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-slide">
+                <img src="public/placeholder.jpg" alt="PUBG Banner 3" class="hero-image">
+                <div class="hero-overlay"></div>
+            </div>
+        </div>
+        
+        <div class="hero-content">
+            <h1 class="hero-title">متجر حسابات PUBG Mobile</h1>
+            <p class="hero-subtitle">أفضل الحسابات المميزة بأسعار منافسة</p>
+            <a href="accounts.php" class="hero-btn">تصفح الحسابات</a>
+        </div>
+        
+        <div class="hero-indicators">
+            <button class="indicator active" data-slide="0"></button>
+            <button class="indicator" data-slide="1"></button>
+            <button class="indicator" data-slide="2"></button>
         </div>
     </section>
 
     <!-- News Ticker -->
     <div class="news-ticker">
         <div class="ticker-content">
-            <span class="ticker-label">أخبار المتجر:</span>
-            <div class="ticker-text">
-                <?php foreach ($news as $item): ?>
-                    <span><?= htmlspecialchars($item['title']) ?></span>
-                <?php endforeach; ?>
-            </div>
+            <?php foreach ($news_items as $news): ?>
+                <span class="ticker-item"><?php echo htmlspecialchars($news['text']); ?></span>
+            <?php endforeach; ?>
         </div>
     </div>
 
-    <!-- Products Section -->
-    <section class="products-section">
+    <!-- Featured Products -->
+    <section class="featured-products">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">حسابات PUBG Mobile المميزة</h2>
-                <p class="section-subtitle">اختر من مجموعتنا المتنوعة من الحسابات المميزة</p>
-            </div>
-
-            <!-- Section Loader -->
-            <div id="productsLoader" class="section-loader">
-                <div class="section-loader-content">
-                    <div class="loader-spinner"></div>
-                    <p>جاري تحميل المنتجات...</p>
-                </div>
-            </div>
-
-            <div id="productsGrid" class="products-grid" style="display: none;">
-                <?php foreach ($products as $product): ?>
-                    <div class="product-card" data-aos="fade-up">
-                        <div class="product-image">
-                            <img src="<?= json_decode($product['images'])[0] ?? 'assets/images/placeholder.jpg' ?>" 
-                                 alt="<?= htmlspecialchars($product['title']) ?>" 
-                                 loading="lazy">
-                            <div class="product-rank"><?= htmlspecialchars($product['rank_name']) ?></div>
-                            <div class="product-overlay">
-                                <a href="product.php?id=<?= $product['id'] ?>" class="btn btn-view">
-                                    <i class="fas fa-eye"></i>
-                                    عرض التفاصيل
-                                </a>
+            <h2 class="section-title">حسابات PUBG Mobile المميزة</h2>
+            <div class="products-grid" id="products-grid">
+                <!-- Loading Skeletons -->
+                <div class="loading-skeletons">
+                    <?php for ($i = 0; $i < 6; $i++): ?>
+                        <div class="product-skeleton">
+                            <div class="skeleton-image"></div>
+                            <div class="skeleton-content">
+                                <div class="skeleton-title"></div>
+                                <div class="skeleton-price"></div>
+                                <div class="skeleton-features"></div>
+                                <div class="skeleton-buttons"></div>
                             </div>
                         </div>
-                        <div class="product-info">
-                            <h3 class="product-title"><?= htmlspecialchars($product['title']) ?></h3>
-                            <div class="product-meta">
-                                <span class="product-price"><?= formatPrice($product['price']) ?></span>
-                                <div class="product-level">
-                                    <i class="fas fa-star"></i>
-                                    <span>المستوى <?= $product['level'] ?></span>
+                    <?php endfor; ?>
+                </div>
+
+                <!-- Actual Products -->
+                <div class="products-container" style="display: none;">
+                    <?php foreach ($featured_products as $product): ?>
+                        <div class="product-card" data-aos="fade-up">
+                            <div class="product-image">
+                                <img src="<?php echo $product['main_image'] ?: 'public/placeholder.jpg'; ?>" 
+                                     alt="<?php echo htmlspecialchars($product['title']); ?>" 
+                                     class="product-img">
+                                <div class="product-rank"><?php echo htmlspecialchars($product['rank']); ?></div>
+                                <div class="product-overlay">
+                                    <a href="product.php?id=<?php echo $product['id']; ?>" class="view-details-btn">
+                                        <i class="fas fa-eye"></i> عرض التفاصيل
+                                    </a>
                                 </div>
                             </div>
-                            <div class="product-features">
-                                <span class="feature-tag"><?= $product['skins_count'] ?>+ سكن</span>
-                                <span class="feature-tag">أسلحة مميزة</span>
-                            </div>
-                            <div class="product-actions">
-                                <a href="https://wa.me/<?= $product['whatsapp_number'] ?>?text=مرحباً، أريد شراء الحساب: <?= urlencode($product['title']) ?>" 
-                                   class="btn btn-whatsapp" target="_blank">
-                                    <i class="fab fa-whatsapp"></i>
-                                    واتساب
-                                </a>
-                                <a href="product.php?id=<?= $product['id'] ?>" class="btn btn-buy">
-                                    <i class="fas fa-shopping-cart"></i>
-                                    شراء
-                                </a>
+                            
+                            <div class="product-info">
+                                <h3 class="product-title"><?php echo htmlspecialchars($product['title']); ?></h3>
+                                <div class="product-meta">
+                                    <span class="product-price"><?php echo number_format($product['price']); ?> ريال</span>
+                                    <div class="product-level">
+                                        <i class="fas fa-star"></i>
+                                        <span>المستوى <?php echo $product['level']; ?></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="product-features">
+                                    <h4>المميزات:</h4>
+                                    <div class="features-tags">
+                                        <span class="feature-tag"><?php echo $product['skins_count']; ?>+ سكن</span>
+                                        <span class="feature-tag"><?php echo htmlspecialchars($product['weapons']); ?></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="product-actions">
+                                    <button class="whatsapp-btn" onclick="contactWhatsApp('<?php echo htmlspecialchars($product['title']); ?>', <?php echo $product['price']; ?>)">
+                                        <i class="fab fa-whatsapp"></i> واتساب
+                                    </button>
+                                    <a href="product.php?id=<?php echo $product['id']; ?>" class="buy-btn">
+                                        <i class="fas fa-shopping-cart"></i> شراء
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-
-            <div class="text-center">
-                <a href="products.php" class="btn btn-primary btn-lg">عرض جميع الحسابات</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features-section">
-        <div class="container">
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>ضمان الأمان</h3>
-                    <p>جميع حساباتنا آمنة ومضمونة 100%</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <h3>تسليم فوري</h3>
-                    <p>احصل على حسابك خلال دقائق من الشراء</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h3>دعم 24/7</h3>
-                    <p>فريق الدعم متاح على مدار الساعة</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-medal"></i>
-                    </div>
-                    <h3>جودة عالية</h3>
-                    <p>حسابات مميزة بأفضل الرتب والأسلحة</p>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>متجر PUBG Mobile</h3>
-                    <p>متجر متخصص في بيع حسابات PUBG Mobile المميزة بأفضل الأسعار وضمان الجودة.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#"><i class="fab fa-telegram"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>روابط سريعة</h4>
-                    <ul>
-                        <li><a href="index.php">الرئيسية</a></li>
-                        <li><a href="products.php">الحسابات</a></li>
-                        <li><a href="about.php">من نحن</a></li>
-                        <li><a href="contact.php">اتصل بنا</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>تواصل معنا</h4>
-                    <div class="contact-info">
-                        <p><i class="fab fa-whatsapp"></i> +967 777 826 667</p>
-                        <p><i class="fas fa-envelope"></i> info@pubgstore.com</p>
-                        <p><i class="fas fa-clock"></i> متاح 24/7</p>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 متجر PUBG Mobile. جميع الحقوق محفوظة.</p>
-            </div>
-        </div>
-    </footer>
+    <?php include 'includes/footer.php'; ?>
 
+    <!-- Scripts -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/loading.js"></script>
+    <script>
+        // WhatsApp Contact Function
+        function contactWhatsApp(title, price) {
+            const message = `مرحباً، أريد شراء الحساب: ${title} - السعر: ${price} ريال`;
+            const whatsappUrl = `https://wa.me/967777826667?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+                document.querySelector('.products-container').style.display = 'grid';
+                document.querySelector('.loading-skeletons').style.display = 'none';
+            }, 2000);
+        });
+    </script>
 </body>
 </html>

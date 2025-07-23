@@ -1,228 +1,229 @@
-// Loading functionality
-document.addEventListener("DOMContentLoaded", () => {
-  initPageLoader()
-  initSectionLoaders()
-  initButtonLoaders()
-  createLoadingParticles()
-})
+// Loading Screen Management
+class LoadingManager {
+  constructor() {
+    this.loadingScreen = null
+    this.progressBar = null
+    this.loadingText = null
+    this.currentProgress = 0
+    this.targetProgress = 0
+    this.isLoading = false
 
-// Page loader functionality
-function initPageLoader() {
-  const pageLoader = document.getElementById("pageLoader")
-  const progressFill = pageLoader.querySelector(".progress-fill")
+    this.init()
+  }
 
-  let progress = 0
-  const loadingMessages = [
-    "جاري تحميل الموقع...",
-    "تحضير المحتوى...",
-    "تحميل المنتجات...",
-    "تقريباً انتهينا...",
-    "مرحباً بك!",
-  ]
-
-  const loaderText = pageLoader.querySelector(".loader-text")
-  let messageIndex = 0
-
-  // Simulate loading progress
-  const progressInterval = setInterval(() => {
-    progress += Math.random() * 15 + 5
-
-    if (progress >= 100) {
-      progress = 100
-      clearInterval(progressInterval)
-
-      setTimeout(() => {
-        pageLoader.classList.add("hidden")
-        document.body.style.overflow = "auto"
-
-        // Show products grid with animation
-        const productsLoader = document.getElementById("productsLoader")
-        const productsGrid = document.getElementById("productsGrid")
-
-        if (productsLoader && productsGrid) {
-          setTimeout(() => {
-            productsLoader.style.display = "none"
-            productsGrid.style.display = "grid"
-            animateProductCards()
-          }, 500)
-        }
-      }, 500)
+  init() {
+    this.loadingScreen = document.getElementById("loading-screen")
+    if (this.loadingScreen) {
+      this.progressBar = this.loadingScreen.querySelector(".progress-fill")
+      this.loadingText = this.loadingScreen.querySelector(".loading-text")
     }
 
-    progressFill.style.width = progress + "%"
+    // Show loading screen on page load
+    this.show()
 
-    // Change loading message
-    if (progress > messageIndex * 20 && messageIndex < loadingMessages.length - 1) {
-      messageIndex++
-      loaderText.textContent = loadingMessages[messageIndex]
+    // Simulate loading progress
+    this.simulateProgress()
+
+    // Hide loading screen when page is fully loaded
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        this.hide()
+      }, 1000)
+    })
+  }
+
+  show(message = "جاري التحميل...") {
+    if (!this.loadingScreen) return
+
+    this.isLoading = true
+    this.loadingScreen.style.display = "flex"
+
+    if (this.loadingText) {
+      this.loadingText.textContent = message
     }
-  }, 150)
 
-  // Hide body overflow during loading
-  document.body.style.overflow = "hidden"
-}
+    // Reset progress
+    this.currentProgress = 0
+    this.targetProgress = 0
+    this.updateProgress()
+  }
 
-// Section loaders functionality
-function initSectionLoaders() {
-  const sectionLoaders = document.querySelectorAll(".section-loader")
+  hide() {
+    if (!this.loadingScreen || !this.isLoading) return
 
-  sectionLoaders.forEach((loader) => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          simulateSectionLoading(entry.target)
-          observer.unobserve(entry.target)
-        }
-      })
-    })
+    this.isLoading = false
 
-    observer.observe(loader)
-  })
-}
-
-function simulateSectionLoading(loader) {
-  setTimeout(
-    () => {
-      loader.style.opacity = "0"
-      loader.style.transform = "scale(0.9)"
-
-      setTimeout(() => {
-        loader.style.display = "none"
-
-        // Show actual content
-        const nextElement = loader.nextElementSibling
-        if (nextElement) {
-          nextElement.style.display = "block"
-          nextElement.style.opacity = "0"
-          nextElement.style.transform = "translateY(20px)"
-
-          setTimeout(() => {
-            nextElement.style.transition = "all 0.5s ease"
-            nextElement.style.opacity = "1"
-            nextElement.style.transform = "translateY(0)"
-          }, 50)
-        }
-      }, 300)
-    },
-    Math.random() * 1000 + 1000,
-  )
-}
-
-// Button loading functionality
-function initButtonLoaders() {
-  const loadingButtons = document.querySelectorAll(".btn-loading")
-
-  loadingButtons.forEach((button) => {
-    button.addEventListener("click", function (e) {
-      if (this.classList.contains("loading")) {
-        e.preventDefault()
-        return
-      }
-
-      // Don't add loading state for navigation links
-      if (this.getAttribute("href") && !this.getAttribute("href").startsWith("#")) {
-        return
-      }
-
-      this.classList.add("loading")
-
-      // Simulate async operation
-      setTimeout(() => {
-        this.classList.remove("loading")
-      }, 2000)
-    })
-  })
-}
-
-// Animate product cards
-function animateProductCards() {
-  const productCards = document.querySelectorAll(".product-card")
-
-  productCards.forEach((card, index) => {
-    card.style.opacity = "0"
-    card.style.transform = "translateY(30px) scale(0.9)"
+    // Complete progress
+    this.setProgress(100)
 
     setTimeout(() => {
-      card.style.transition = "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
-      card.style.opacity = "1"
-      card.style.transform = "translateY(0) scale(1)"
-    }, index * 100)
-  })
-}
-
-// Create loading particles
-function createLoadingParticles() {
-  const pageLoader = document.getElementById("pageLoader")
-  if (!pageLoader) return
-
-  const particlesContainer = document.createElement("div")
-  particlesContainer.className = "loading-particles"
-
-  for (let i = 0; i < 5; i++) {
-    const particle = document.createElement("div")
-    particle.className = "particle"
-    particle.style.left = Math.random() * 100 + "%"
-    particle.style.animationDelay = Math.random() * 3 + "s"
-    particlesContainer.appendChild(particle)
+      this.loadingScreen.style.opacity = "0"
+      setTimeout(() => {
+        this.loadingScreen.style.display = "none"
+        this.loadingScreen.style.opacity = "1"
+      }, 500)
+    }, 500)
   }
 
-  pageLoader.appendChild(particlesContainer)
-}
+  setProgress(progress) {
+    this.targetProgress = Math.min(100, Math.max(0, progress))
+    this.animateProgress()
+  }
 
-// Show skeleton loading for cards
-function showSkeletonCards(container, count = 6) {
-  container.innerHTML = ""
+  animateProgress() {
+    if (Math.abs(this.currentProgress - this.targetProgress) < 0.1) {
+      this.currentProgress = this.targetProgress
+      this.updateProgress()
+      return
+    }
 
-  for (let i = 0; i < count; i++) {
-    const skeletonCard = document.createElement("div")
-    skeletonCard.className = "skeleton-card"
-    skeletonCard.innerHTML = `
-            <div class="skeleton-image"></div>
-            <div class="skeleton-content">
-                <div class="skeleton-line long"></div>
-                <div class="skeleton-line medium"></div>
-                <div class="skeleton-line short"></div>
-            </div>
-        `
-    container.appendChild(skeletonCard)
+    this.currentProgress += (this.targetProgress - this.currentProgress) * 0.1
+    this.updateProgress()
+
+    requestAnimationFrame(() => this.animateProgress())
+  }
+
+  updateProgress() {
+    if (this.progressBar) {
+      this.progressBar.style.width = `${this.currentProgress}%`
+    }
+  }
+
+  simulateProgress() {
+    if (!this.isLoading) return
+
+    const increment = Math.random() * 15 + 5
+    const newProgress = Math.min(90, this.targetProgress + increment)
+
+    this.setProgress(newProgress)
+
+    if (newProgress < 90) {
+      setTimeout(() => this.simulateProgress(), 200 + Math.random() * 300)
+    }
+  }
+
+  updateMessage(message) {
+    if (this.loadingText) {
+      this.loadingText.textContent = message
+    }
   }
 }
 
-// Loading state management
-const LoadingManager = {
-  show: (element, message = "جاري التحميل...") => {
-    if (typeof element === "string") {
-      element = document.querySelector(element)
+// Button Loading States
+class ButtonLoader {
+  static show(button, loadingText = "جاري التحميل...") {
+    if (!button) return
+
+    button.classList.add("loading")
+    button.disabled = true
+
+    const btnText = button.querySelector(".btn-text")
+    const btnLoading = button.querySelector(".btn-loading")
+
+    if (btnText) btnText.style.display = "none"
+    if (btnLoading) {
+      btnLoading.style.display = "inline-flex"
+      btnLoading.textContent = loadingText
     }
+  }
 
-    if (!element) return
+  static hide(button) {
+    if (!button) return
 
-    const loader = document.createElement("div")
-    loader.className = "loading-overlay"
-    loader.innerHTML = `
-            <div class="loading-content">
-                <div class="loader-spinner"></div>
-                <p>${message}</p>
-            </div>
-        `
+    button.classList.remove("loading")
+    button.disabled = false
 
-    element.style.position = "relative"
-    element.appendChild(loader)
-  },
+    const btnText = button.querySelector(".btn-text")
+    const btnLoading = button.querySelector(".btn-loading")
 
-  hide: (element) => {
-    if (typeof element === "string") {
-      element = document.querySelector(element)
-    }
-
-    if (!element) return
-
-    const loader = element.querySelector(".loading-overlay")
-    if (loader) {
-      loader.remove()
-    }
-  },
+    if (btnText) btnText.style.display = "inline"
+    if (btnLoading) btnLoading.style.display = "none"
+  }
 }
 
-// Export for use in other scripts
+// Page Transition Effects
+class PageTransition {
+  static fadeOut(callback) {
+    document.body.style.opacity = "0"
+    document.body.style.transition = "opacity 0.3s ease"
+
+    setTimeout(() => {
+      if (callback) callback()
+    }, 300)
+  }
+
+  static fadeIn() {
+    document.body.style.opacity = "1"
+  }
+}
+
+// Skeleton Loading
+class SkeletonLoader {
+  static show(container) {
+    if (!container) return
+
+    const skeletons = container.querySelectorAll(".loading-skeletons")
+    const content = container.querySelectorAll(".products-container, .accounts-container")
+
+    skeletons.forEach((skeleton) => (skeleton.style.display = "grid"))
+    content.forEach((item) => (item.style.display = "none"))
+  }
+
+  static hide(container) {
+    if (!container) return
+
+    const skeletons = container.querySelectorAll(".loading-skeletons")
+    const content = container.querySelectorAll(".products-container, .accounts-container")
+
+    skeletons.forEach((skeleton) => (skeleton.style.display = "none"))
+    content.forEach((item) => (item.style.display = "grid"))
+  }
+}
+
+// Initialize loading manager
+const loadingManager = new LoadingManager()
+
+// Export for global use
 window.LoadingManager = LoadingManager
+window.ButtonLoader = ButtonLoader
+window.PageTransition = PageTransition
+window.SkeletonLoader = SkeletonLoader
+window.loadingManager = loadingManager
+
+// Navigation Loading
+document.addEventListener("DOMContentLoaded", () => {
+  const links = document.querySelectorAll(
+    'a[href]:not([href^="#"]):not([href^="mailto:"]):not([href^="tel:"]):not([target="_blank"])',
+  )
+
+  links.forEach((link) => {
+    link.addEventListener("click", function (e) {
+      const href = this.getAttribute("href")
+
+      // Skip if it's the current page
+      if (href === window.location.pathname) return
+
+      e.preventDefault()
+
+      loadingManager.show("جاري التنقل...")
+
+      setTimeout(() => {
+        window.location.href = href
+      }, 500)
+    })
+  })
+})
+
+// Form Loading States
+document.addEventListener("DOMContentLoaded", () => {
+  const forms = document.querySelectorAll("form")
+
+  forms.forEach((form) => {
+    form.addEventListener("submit", function (e) {
+      const submitBtn = this.querySelector('button[type="submit"]')
+      if (submitBtn) {
+        ButtonLoader.show(submitBtn, "جاري الإرسال...")
+      }
+    })
+  })
+})

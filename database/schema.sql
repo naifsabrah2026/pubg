@@ -1,98 +1,248 @@
--- إنشاء قاعدة البيانات
+-- PUBG Store Database Schema
+
+-- Create database
 CREATE DATABASE IF NOT EXISTS pubg_store CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE pubg_store;
 
--- جدول المنتجات
+-- Products table
 CREATE TABLE products (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
-    rank_name VARCHAR(50) NOT NULL,
-    level INT NOT NULL,
+    category ENUM('conqueror', 'ace', 'crown', 'diamond', 'platinum', 'gold', 'silver', 'bronze', 'premium', 'various') NOT NULL,
+    rank VARCHAR(100),
+    level INT DEFAULT 1,
     skins_count INT DEFAULT 0,
     weapons TEXT,
     features JSON,
+    main_image VARCHAR(500),
     images JSON,
-    category VARCHAR(50) DEFAULT 'general',
-    status ENUM('active', 'inactive', 'sold') DEFAULT 'active',
-    whatsapp_number VARCHAR(20) DEFAULT '967777826667',
+    details JSON,
+    status ENUM('active', 'sold', 'pending', 'inactive') DEFAULT 'active',
+    featured BOOLEAN DEFAULT FALSE,
     views INT DEFAULT 0,
+    whatsapp_number VARCHAR(20) DEFAULT '+967777826667',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_category (category),
+    INDEX idx_status (status),
+    INDEX idx_featured (featured),
+    INDEX idx_price (price),
+    INDEX idx_created_at (created_at)
 );
 
--- جدول المستخدمين
+-- Product images table
+CREATE TABLE product_images (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    image_url VARCHAR(500) NOT NULL,
+    alt_text VARCHAR(255),
+    sort_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    INDEX idx_product_id (product_id),
+    INDEX idx_sort_order (sort_order)
+);
+
+-- Users table
 CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(100) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'user') DEFAULT 'user',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP NULL
-);
-
--- جدول الأخبار
-CREATE TABLE news (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- جدول الطلبات
-CREATE TABLE orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    product_id INT,
-    customer_name VARCHAR(255) NOT NULL,
-    customer_phone VARCHAR(20) NOT NULL,
-    customer_email VARCHAR(255),
-    status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
-    total_amount DECIMAL(10,2) NOT NULL,
-    notes TEXT,
+    full_name VARCHAR(255),
+    phone VARCHAR(20),
+    role ENUM('admin', 'editor', 'user') DEFAULT 'user',
+    status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
+    last_login TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
+    
+    INDEX idx_username (username),
+    INDEX idx_email (email),
+    INDEX idx_role (role),
+    INDEX idx_status (status)
 );
 
--- جدول الإحصائيات
-CREATE TABLE statistics (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    total_products INT DEFAULT 0,
-    total_orders INT DEFAULT 0,
-    total_sales DECIMAL(12,2) DEFAULT 0,
-    total_users INT DEFAULT 0,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- Orders table
+CREATE TABLE orders (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    order_number VARCHAR(50) UNIQUE NOT NULL,
+    customer_name VARCHAR(255) NOT NULL,
+    customer_email VARCHAR(255),
+    customer_phone VARCHAR(20) NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    status ENUM('pending', 'confirmed', 'processing', 'completed', 'cancelled', 'refunded') DEFAULT 'pending',
+    payment_method ENUM('whatsapp', 'bank_transfer', 'cash', 'online') DEFAULT 'whatsapp',
+    payment_status ENUM('pending', 'paid', 'failed', 'refunded') DEFAULT 'pending',
+    notes TEXT,
+    admin_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_order_number (order_number),
+    INDEX idx_status (status),
+    INDEX idx_payment_status (payment_status),
+    INDEX idx_created_at (created_at)
 );
 
--- إدراج بيانات تجريبية للمنتجات
-INSERT INTO products (title, description, price, rank_name, level, skins_count, weapons, features, images, category) VALUES
-('حساب كونكر مع أسلحة ذهبية', 'حساب مميز برتبة كونكر مع مجموعة كبيرة من الأسلحة الذهبية والأزياء النادرة. يحتوي على أكثر من 50 سكن نادر وأسلحة مطورة بالكامل.', 500.00, 'Conqueror', 100, 50, 'أسلحة ذهبية، M416 الجليدي، AKM الذهبي، AWM المطور، Groza النادر', '["رتبة كونكر", "أسلحة ذهبية", "أزياء نادرة", "مستوى عالي", "UC متوفر"]', '["assets/images/conqueror1.jpg", "assets/images/conqueror2.jpg", "assets/images/conqueror3.jpg"]', 'conqueror'),
+-- Order items table
+CREATE TABLE order_items (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    product_title VARCHAR(255) NOT NULL,
+    product_price DECIMAL(10,2) NOT NULL,
+    quantity INT DEFAULT 1,
+    subtotal DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT,
+    INDEX idx_order_id (order_id),
+    INDEX idx_product_id (product_id)
+);
 
-('حساب آيس مع أزياء نادرة', 'حساب برتبة آيس يحتوي على أزياء نادرة ومركبات مميزة. مثالي للاعبين المحترفين الذين يريدون التميز في اللعبة.', 350.00, 'Ace', 85, 30, 'أسلحة مطورة، سكارل الأزرق، M24 المطور، Vector الذهبي', '["رتبة آيس", "أزياء نادرة", "مركبات مميزة", "UC متوفر", "شخصيات مميزة"]', '["assets/images/ace1.jpg", "assets/images/ace2.jpg", "assets/images/ace3.jpg"]', 'premium'),
+-- News/Announcements table
+CREATE TABLE news (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    text TEXT NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
+    views INT DEFAULT 0,
+    sort_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_active (active),
+    INDEX idx_sort_order (sort_order)
+);
 
-('حساب كراون مع مركبات', 'حساب برتبة كراون مع مجموعة من المركبات النادرة والأسلحة المطورة. يحتوي على دراجة نارية ذهبية وسيارة مدرعة.', 250.00, 'Crown', 70, 20, 'مركبات نادرة، دراجة نارية ذهبية، سيارة مدرعة، أسلحة متنوعة', '["رتبة كراون", "مركبات نادرة", "أسلحة مطورة", "أزياء متنوعة"]', '["assets/images/crown1.jpg", "assets/images/crown2.jpg", "assets/images/crown3.jpg"]', 'various'),
+-- Activities/Logs table
+CREATE TABLE activities (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('product_added', 'product_updated', 'product_sold', 'order_created', 'order_updated', 'user_registered', 'admin_login', 'news_added', 'news_updated') NOT NULL,
+    description TEXT NOT NULL,
+    icon VARCHAR(50) DEFAULT 'fas fa-info-circle',
+    user_id INT NULL,
+    related_id INT NULL,
+    amount DECIMAL(10,2) NULL,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_type (type),
+    INDEX idx_created_at (created_at),
+    INDEX idx_user_id (user_id)
+);
 
-('حساب ديامند مع UC', 'حساب برتبة ديامند يحتوي على UC ومجموعة من الأسلحة والأزياء. مناسب للاعبين الذين يريدون حساب متوسط بسعر معقول.', 200.00, 'Diamond', 60, 15, 'UC متوفر، أسلحة متنوعة، أزياء كلاسيكية، شخصيات أساسية', '["رتبة ديامند", "UC متوفر", "أسلحة متنوعة", "أزياء كلاسيكية"]', '["assets/images/diamond1.jpg", "assets/images/diamond2.jpg", "assets/images/diamond3.jpg"]', 'various'),
+-- Settings table
+CREATE TABLE settings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    setting_key VARCHAR(100) UNIQUE NOT NULL,
+    setting_value TEXT,
+    setting_type ENUM('string', 'number', 'boolean', 'json') DEFAULT 'string',
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_setting_key (setting_key)
+);
 
-('حساب بلاتينيوم مميز', 'حساب برتبة بلاتينيوم مع أسلحة نادرة وأزياء متميزة. خيار ممتاز للاعبين المتوسطين.', 150.00, 'Platinum', 50, 10, 'أسلحة نادرة، M416 الأزرق، VSS المطور، UMP45 الذهبي', '["رتبة بلاتينيوم", "أسلحة نادرة", "أزياء متميزة", "مستوى متوسط"]', '["assets/images/platinum1.jpg", "assets/images/platinum2.jpg", "assets/images/platinum3.jpg"]', 'various'),
+-- Coupons table
+CREATE TABLE coupons (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    type ENUM('percentage', 'fixed') NOT NULL,
+    value DECIMAL(10,2) NOT NULL,
+    minimum_amount DECIMAL(10,2) DEFAULT 0,
+    usage_limit INT DEFAULT NULL,
+    used_count INT DEFAULT 0,
+    active BOOLEAN DEFAULT TRUE,
+    expires_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_code (code),
+    INDEX idx_active (active),
+    INDEX idx_expires_at (expires_at)
+);
 
-('حساب جولد للمبتدئين', 'حساب مناسب للمبتدئين برتبة جولد مع الأساسيات. سعر مناسب وجودة مضمونة.', 100.00, 'Gold', 40, 5, 'أسلحة أساسية، M416 عادي، AKM عادي، Kar98k أساسي', '["رتبة جولد", "مناسب للمبتدئين", "أسلحة أساسية", "سعر مناسب"]', '["assets/images/gold1.jpg", "assets/images/gold2.jpg", "assets/images/gold3.jpg"]', 'various');
+-- Reviews table
+CREATE TABLE reviews (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    customer_name VARCHAR(255) NOT NULL,
+    customer_email VARCHAR(255),
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    INDEX idx_product_id (product_id),
+    INDEX idx_status (status),
+    INDEX idx_rating (rating)
+);
 
--- إدراج بيانات تجريبية للأخبار
-INSERT INTO news (title, content, is_active) VALUES
-('🔥 عروض خاصة على حسابات الكونكر!', 'خصم 20% على جميع حسابات الكونكر لفترة محدودة. استغل الفرصة الآن!', TRUE),
-('⭐ وصول حسابات جديدة مع أسلحة نادرة', 'تم إضافة مجموعة جديدة من الحسابات المميزة مع أسلحة ذهبية نادرة', TRUE),
-('💰 تحديث أسعار الحسابات', 'تم تحديث أسعار بعض الحسابات لتكون أكثر تنافسية في السوق', TRUE),
-('🎮 نصائح للعب PUBG Mobile', 'تعلم أفضل الاستراتيجيات للفوز في PUBG Mobile من خبرائنا', TRUE);
+-- Page views table for analytics
+CREATE TABLE page_views (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    page_url VARCHAR(500) NOT NULL,
+    page_title VARCHAR(255),
+    user_ip VARCHAR(45),
+    user_agent TEXT,
+    referrer VARCHAR(500),
+    session_id VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_page_url (page_url),
+    INDEX idx_created_at (created_at),
+    INDEX idx_session_id (session_id)
+);
 
--- إدراج مستخدم إداري افتراضي
-INSERT INTO users (username, email, password_hash, role) VALUES
-('admin', 'admin@pubgstore.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+-- Create views for reporting
+CREATE VIEW product_stats AS
+SELECT 
+    p.id,
+    p.title,
+    p.category,
+    p.price,
+    p.views,
+    p.status,
+    COUNT(oi.id) as sales_count,
+    SUM(oi.subtotal) as total_revenue,
+    AVG(r.rating) as avg_rating,
+    COUNT(r.id) as review_count
+FROM products p
+LEFT JOIN order_items oi ON p.id = oi.product_id
+LEFT JOIN orders o ON oi.order_id = o.id AND o.status = 'completed'
+LEFT JOIN reviews r ON p.id = r.product_id AND r.status = 'approved'
+GROUP BY p.id;
 
--- إدراج إحصائيات أولية
-INSERT INTO statistics (total_products, total_orders, total_sales, total_users) VALUES
-(6, 0, 0.00, 1);
+CREATE VIEW monthly_sales AS
+SELECT 
+    DATE_FORMAT(created_at, '%Y-%m') as month,
+    COUNT(*) as order_count,
+    SUM(total_amount) as total_amount,
+    AVG(total_amount) as avg_order_value
+FROM orders 
+WHERE status = 'completed'
+GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+ORDER BY month DESC;
+
+CREATE VIEW daily_stats AS
+SELECT 
+    DATE(created_at) as date,
+    COUNT(*) as total_orders,
+    SUM(CASE WHEN status = 'completed' THEN total_amount ELSE 0 END) as revenue,
+    COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_orders,
+    COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_orders
+FROM orders
+WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+GROUP BY DATE(created_at)
+ORDER BY date DESC;
