@@ -1,79 +1,46 @@
-"use client"
+import type React from "react"
 
-import { useState, useEffect } from "react"
-import AccountCard from "./AccountCard"
-import SectionLoader from "./SectionLoader"
-
-interface AccountsSectionProps {
-  title: string
-  category: string
-}
-
-const mockAccounts = {
-  conqueror: [
-    {
-      id: 1,
-      title: "حساب كونكر S24",
-      price: "800 ريال",
-      image: "/placeholder.svg?height=200&width=300&text=Conqueror",
+const mockAccounts = [
+  {
+    id: 1,
+    title: "حساب كونكر مميز - سيزن 25",
+    price: 450,
+    images: [
+      "/placeholder.svg?height=300&width=400&text=PUBG+Account+1",
+      "/placeholder.svg?height=300&width=400&text=PUBG+Account+2",
+    ],
+    details: {
       rank: "كونكر",
-      season: "S24",
-      kd: "4.5",
-      level: "100",
-    },
-  ],
-  premium: [
-    {
-      id: 2,
-      title: "حساب آيس مميز",
-      price: "400 ريال",
-      image: "/placeholder.svg?height=200&width=300&text=Ace",
-      rank: "آيس",
-      season: "S24",
-      kd: "3.2",
       level: "85",
+      kd: "3.2",
+      matches: "1250",
+      wins: "320",
+      uc: "15000",
+      // Add more details as needed
     },
-  ],
-  various: [
-    {
-      id: 3,
-      title: "حساب متنوع",
-      price: "200 ريال",
-      image: "/placeholder.svg?height=200&width=300&text=Various",
-      rank: "كراون",
-      season: "S23",
-      kd: "2.8",
-      level: "60",
-    },
-  ],
-}
+  },
+  // Add more mock accounts with proper structure
+]
 
-export default function AccountsSection({ title, category }: AccountsSectionProps) {
-  const [accounts, setAccounts] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    const timer = setTimeout(
-      () => {
-        setAccounts(mockAccounts[category as keyof typeof mockAccounts] || [])
-        setIsLoading(false)
-      },
-      1000 + Math.random() * 1000,
-    ) // Random delay for realistic effect
-
-    return () => clearTimeout(timer)
-  }, [category])
-
+const AccountsSection: React.FC = () => {
   return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-bold mb-6 text-yellow-400">{title}</h2>
-      <SectionLoader isLoading={isLoading} message={`جاري تحميل ${title}...`}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {accounts.map((account) => (
-            <AccountCard key={account.id} account={account} />
+    <div>
+      {/* Implement your accounts section here using mockAccounts data */}
+      <h2>Accounts Section</h2>
+      {mockAccounts.map((account) => (
+        <div key={account.id}>
+          <h3>{account.title}</h3>
+          <p>Price: {account.price}</p>
+          {account.images.map((image, index) => (
+            <img key={index} src={image || "/placeholder.svg"} alt={`Account ${account.id} - Image ${index + 1}`} />
           ))}
+          <p>Rank: {account.details.rank}</p>
+          <p>Level: {account.details.level}</p>
+          {/* Display other account details */}
         </div>
-      </SectionLoader>
-    </section>
+      ))}
+    </div>
   )
 }
+
+export default AccountsSection
