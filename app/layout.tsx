@@ -1,15 +1,18 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Cairo } from "next/font/google"
+import { Inter } from "next/font/google"
 import "./globals.css"
 import Header from "@/components/Header"
+import NavigationLoader from "@/components/NavigationLoader"
+import { ThemeProvider } from "@/components/theme-provider"
 
-const cairo = Cairo({ subsets: ["arabic"] })
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "متجر حسابات PUBG Mobile - أفضل الحسابات المميزة",
-  description: "متجر متخصص في بيع حسابات PUBG Mobile المميزة بأسعار منافسة. حسابات كونكر، أسلحة ذهبية، وأزياء نادرة.",
-  keywords: "PUBG Mobile, حسابات ببجي, كونكر, أسلحة ذهبية, أزياء نادرة",
+  description:
+    "متجر متخصص في بيع حسابات PUBG Mobile المميزة بأفضل الأسعار. حسابات كونكر، آيس، كراون وأكثر مع ضمان الجودة والأمان.",
+  keywords: "PUBG Mobile, حسابات ببجي, كونكر, آيس, حسابات مميزة",
     generator: 'v0.dev'
 }
 
@@ -20,9 +23,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={cairo.className}>
-        <Header />
-        {children}
+      <body className={inter.className}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <NavigationLoader />
+          <Header />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -1,148 +1,46 @@
-import AccountCard from "./AccountCard"
+import type React from "react"
 
-const accountsData = {
-  conqueror: [
-    {
-      id: 1,
-      title: "حساب كونكر S1",
-      price: 200,
-      images: Array(7).fill("/placeholder.svg?height=150&width=150"),
-      details: {
-        rank: "Conqueror",
-        level: 90,
-        kd: "4.2",
-        matches: 1250,
-        wins: 320,
-        topTen: 850,
-        headshots: "25%",
-        damage: "450 avg",
-        survival: "12 min avg",
-        weapons: ["AKM الذهبي", "M416 الجليدي", "AWM النادر"],
-        outfits: ["بدلة التنين", "خوذة الأسد", "حقيبة الذهب"],
-        vehicles: ["دراجة نارية ذهبية", "سيارة VIP"],
-        uc: "5000 UC",
-        bp: "50000 BP",
-        crates: "20 صندوق مميز",
-        achievements: "150 إنجاز",
-        friends: "500 صديق",
-        clan: "عضو في كلان مميز",
-        season: "الموسم الحالي",
-        server: "الشرق الأوسط",
-        device: "iOS/Android",
-        email: "متاح تغيير الإيميل",
-        phone: "مربوط برقم هاتف",
-        facebook: "غير مربوط",
-        twitter: "غير مربوط",
-        google: "غير مربوط",
-        warranty: "ضمان 30 يوم",
-        support: "دعم فني 24/7",
-        delivery: "تسليم فوري",
-        payment: "دفع آمن",
-        refund: "استرداد مضمون",
-        verification: "حساب موثق",
-        status: "متاح للبيع",
-      },
+const mockAccounts = [
+  {
+    id: 1,
+    title: "حساب كونكر مميز - سيزن 25",
+    price: 450,
+    images: [
+      "/placeholder.svg?height=300&width=400&text=PUBG+Account+1",
+      "/placeholder.svg?height=300&width=400&text=PUBG+Account+2",
+    ],
+    details: {
+      rank: "كونكر",
+      level: "85",
+      kd: "3.2",
+      matches: "1250",
+      wins: "320",
+      uc: "15000",
+      // Add more details as needed
     },
-  ],
-  premium: [
-    {
-      id: 2,
-      title: "حساب مميز P1",
-      price: 120,
-      images: Array(7).fill("/placeholder.svg?height=150&width=150"),
-      details: {
-        rank: "Crown",
-        level: 75,
-        kd: "3.8",
-        matches: 980,
-        wins: 245,
-        topTen: 650,
-        headshots: "22%",
-        damage: "380 avg",
-        survival: "10 min avg",
-        weapons: ["M416 المطور", "SCAR-L النادر"],
-        outfits: ["بدلة القتال", "خوذة التكتيك"],
-        vehicles: ["سيارة رياضية"],
-        uc: "3000 UC",
-        bp: "30000 BP",
-        crates: "15 صندوق",
-        achievements: "120 إنجاز",
-        friends: "300 صديق",
-        clan: "عضو في كلان نشط",
-        season: "الموسم الحالي",
-        server: "الشرق الأوسط",
-        device: "iOS/Android",
-        email: "متاح تغيير الإيميل",
-        phone: "مربوط برقم هاتف",
-        facebook: "غير مربوط",
-        twitter: "غير مربوط",
-        google: "غير مربوط",
-        warranty: "ضمان 21 يوم",
-        support: "دعم فني",
-        delivery: "تسليم خلال ساعة",
-        payment: "دفع آمن",
-        refund: "استرداد مضمون",
-        verification: "حساب موثق",
-        status: "متاح للبيع",
-      },
-    },
-  ],
-  various: [
-    {
-      id: 3,
-      title: "حساب متنوع V1",
-      price: 60,
-      images: Array(7).fill("/placeholder.svg?height=150&width=150"),
-      details: {
-        rank: "Diamond",
-        level: 50,
-        kd: "2.5",
-        matches: 500,
-        wins: 120,
-        topTen: 300,
-        headshots: "18%",
-        damage: "280 avg",
-        survival: "8 min avg",
-        weapons: ["M416 العادي", "AKM المطور"],
-        outfits: ["بدلة عادية", "خوذة أساسية"],
-        vehicles: ["سيارة عادية"],
-        uc: "1000 UC",
-        bp: "15000 BP",
-        crates: "5 صناديق",
-        achievements: "80 إنجاز",
-        friends: "150 صديق",
-        clan: "بدون كلان",
-        season: "الموسم الحالي",
-        server: "الشرق الأوسط",
-        device: "Android",
-        email: "متاح تغيير الإيميل",
-        phone: "مربوط برقم هاتف",
-        facebook: "غير مربوط",
-        twitter: "غير مربوط",
-        google: "غير مربوط",
-        warranty: "ضمان 14 يوم",
-        support: "دعم أساسي",
-        delivery: "تسليم خلال 3 ساعات",
-        payment: "دفع آمن",
-        refund: "استرداد محدود",
-        verification: "حساب عادي",
-        status: "متاح للبيع",
-      },
-    },
-  ],
-}
+  },
+  // Add more mock accounts with proper structure
+]
 
-export default function AccountsSection({ title, category }: { title: string; category: keyof typeof accountsData }) {
-  const accounts = accountsData[category] || []
-
+const AccountsSection: React.FC = () => {
   return (
-    <section>
-      <h2 className="text-3xl font-bold text-yellow-400 mb-6 text-center">{title}</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {accounts.map((account) => (
-          <AccountCard key={account.id} account={account} />
-        ))}
-      </div>
-    </section>
+    <div>
+      {/* Implement your accounts section here using mockAccounts data */}
+      <h2>Accounts Section</h2>
+      {mockAccounts.map((account) => (
+        <div key={account.id}>
+          <h3>{account.title}</h3>
+          <p>Price: {account.price}</p>
+          {account.images.map((image, index) => (
+            <img key={index} src={image || "/placeholder.svg"} alt={`Account ${account.id} - Image ${index + 1}`} />
+          ))}
+          <p>Rank: {account.details.rank}</p>
+          <p>Level: {account.details.level}</p>
+          {/* Display other account details */}
+        </div>
+      ))}
+    </div>
   )
 }
+
+export default AccountsSection

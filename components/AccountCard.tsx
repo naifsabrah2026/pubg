@@ -16,6 +16,10 @@ export default function AccountCard({ account }: { account: Account }) {
   const [currentImage, setCurrentImage] = useState(0)
   const [showDetails, setShowDetails] = useState(false)
 
+  // Add safety checks for images
+  const images = account.images || []
+  const hasImages = images.length > 0
+
   const handleWhatsAppContact = () => {
     const accountInfo = Object.entries(account.details)
       .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`)
@@ -31,22 +35,24 @@ export default function AccountCard({ account }: { account: Account }) {
       {/* Image Gallery */}
       <div className="relative h-64">
         <Image
-          src={account.images[currentImage] || "/placeholder.svg"}
+          src={hasImages ? images[currentImage] : "/placeholder.svg?height=300&width=400&text=PUBG+Account"}
           alt={`${account.title} - صورة ${currentImage + 1}`}
           fill
           className="object-cover"
         />
-        <div className="absolute bottom-2 left-2 flex space-x-1">
-          {account.images.map((_, index) => (
-            <button
-              key={index}
-              className={`w-2 h-2 rounded-full ${index === currentImage ? "bg-yellow-400" : "bg-white bg-opacity-50"}`}
-              onClick={() => setCurrentImage(index)}
-            />
-          ))}
-        </div>
+        {hasImages && (
+          <div className="absolute bottom-2 left-2 flex space-x-1">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                className={`w-2 h-2 rounded-full ${index === currentImage ? "bg-yellow-400" : "bg-white bg-opacity-50"}`}
+                onClick={() => setCurrentImage(index)}
+              />
+            ))}
+          </div>
+        )}
         <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 rounded text-sm font-bold">
-          {account.details.rank}
+          {account.details?.rank || "غير محدد"}
         </div>
       </div>
 
@@ -57,7 +63,7 @@ export default function AccountCard({ account }: { account: Account }) {
           <span className="text-2xl font-bold text-white">${account.price}</span>
           <div className="flex items-center text-yellow-400">
             <Star className="w-4 h-4 fill-current" />
-            <span className="ml-1 text-sm">المستوى {account.details.level}</span>
+            <span className="ml-1 text-sm">المستوى {account.details?.level || "غير محدد"}</span>
           </div>
         </div>
 
@@ -65,19 +71,19 @@ export default function AccountCard({ account }: { account: Account }) {
         <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
           <div className="bg-gray-800 p-2 rounded">
             <span className="text-yellow-400">K/D:</span>
-            <span className="text-white ml-1">{account.details.kd}</span>
+            <span className="text-white ml-1">{account.details?.kd || "غير محدد"}</span>
           </div>
           <div className="bg-gray-800 p-2 rounded">
             <span className="text-yellow-400">المباريات:</span>
-            <span className="text-white ml-1">{account.details.matches}</span>
+            <span className="text-white ml-1">{account.details?.matches || "غير محدد"}</span>
           </div>
           <div className="bg-gray-800 p-2 rounded">
             <span className="text-yellow-400">الانتصارات:</span>
-            <span className="text-white ml-1">{account.details.wins}</span>
+            <span className="text-white ml-1">{account.details?.wins || "غير محدد"}</span>
           </div>
           <div className="bg-gray-800 p-2 rounded">
             <span className="text-yellow-400">UC:</span>
-            <span className="text-white ml-1">{account.details.uc}</span>
+            <span className="text-white ml-1">{account.details?.uc || "غير محدد"}</span>
           </div>
         </div>
 
